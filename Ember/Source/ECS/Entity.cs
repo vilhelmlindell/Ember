@@ -1,25 +1,23 @@
 ﻿using System.Collections;
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("World")]
-
 namespace Ember.ECS
 {
     public class Entity
     {
-        internal int Index;
-        internal int Version;
-        internal BitArray ComponentMask;
+        public readonly World World;
 
-        internal Entity(int index, int version)
+        public Entity(int index, int version, World world)
         {
+            World = world;
             Index = index;
             Version = version;
-            ComponentMask = new BitArray(World.MaxComponents);
+            ComponentBits = new BitArray(world.MaxComponentTypes);
+        }
+        private Entity(long id)
+        {
+            ID = id;
         }
 
-        public static long InvalidEntity = CreateId(-1, 0);
-        public long Id
+        public long ID
         {
             get 
             { 
@@ -31,10 +29,32 @@ namespace Ember.ECS
                 Version = (int)value;
             }
         }
+        public int Index { get; internal set; }
+        public int Version { get; internal set; }
+        public BitArray ComponentBits { get; internal set; }
 
-        internal static long CreateId(int index, int version)
+        public static long InvalidId = CreateId(-1, 0);
+        public static Entity Invalid = new Entity(InvalidId);
+        public static long CreateId(int index, int version)
         {
             return (index << 32) | version;
         }
+
+        public void AddComponent<T>(T component)
+        {
+            World.ComponentManager.AddComponent(this, component);
+        }
+        public void RemoveComponent<T>()
+        {
+            World.ComponentManager.RemoveComponent<T>(this);
+        }
+        public T GetComponent<T>()
+        {
+            return World.ComponentManager.GetComponent<T>(this);
+        }
+        public bool HasComponent<T>()
+        {
+            return World.ComponentManager.HasComponent<T>(this);
+        }    
     }
 }

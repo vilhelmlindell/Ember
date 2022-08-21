@@ -12,6 +12,11 @@
 	<ApplicationManifest>app.manifest</ApplicationManifest>
 	<ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Source\UI\**" />
+	  <EmbeddedResource Remove="Source\UI\**" />
+	  <None Remove="Source\UI\**" />
+	</ItemGroup>
   <ItemGroup>
 	<None Remove="Icon.ico" />
 	<None Remove="Icon.bmp" />
@@ -27,7 +32,15 @@
 	<TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
+	<PackageReference Include="FontStashSharp.MonoGame" Version="1.1.6" />
+	<PackageReference Include="MonoGame.Extended.Graphics" Version="3.8.0" />
+	<PackageReference Include="MonoGame.Extended.Tweening" Version="3.8.0" />
 	<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
 	<PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
+	<PackageReference Include="Myra" Version="1.4.2" />
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\Assets\Sprites\" />
   </ItemGroup>
 </Project>
