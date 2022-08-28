@@ -2,29 +2,46 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Ember.Graphics;
 
-namespace Ember.GUI
+namespace Ember.UI
 {
     public enum ButtonState
     {
         None,
         Hovered,
         Held
-    };
+    }
+    public enum HorizontalAlignment
+    {
+        None,
+        Left,
+        Right,
+        Center
+    }
+    public enum VerticalAlignment
+    {
+        None,
+        Top,
+        Bottom,
+        Center
+    }
 
     public class Element
     {
         public Element Parent;
         public List<Element> Children = new List<Element>();
+        public HorizontalAlignment HorizontalAlignment = HorizontalAlignment.None;
+        public VerticalAlignment VerticalAlignment = VerticalAlignment.None;
+        public Vector2 Origin;
         public bool IsHovered;
         public bool IsHeld;
-        public float LayerDepth;
-        public Vector2 Origin;
 
         private float _x;
         private float _y;
-        private float _width = 100f;
-        private float _height = 100f;
+        private float _width;
+        private float _height;
+        private float _layerDepth = DrawLayer.UI;
 
         public Element()
         {
@@ -38,7 +55,20 @@ namespace Ember.GUI
 
         public virtual float X
         {
-            get => _x;
+            get
+            {
+                switch(HorizontalAlignment)
+                {
+                    case HorizontalAlignment.Left:
+                        return 0;
+                    case HorizontalAlignment.Right:
+                        return Parent.Bounds.Right - Width;
+                    case HorizontalAlignment.Center:
+                        return (Parent.Bounds.Right - Width) / 2;
+                    default:
+                        return _x;
+                }
+            }
             set
             {
                 _x = value;
@@ -47,7 +77,20 @@ namespace Ember.GUI
         }
         public virtual float Y
         {
-            get => _y;
+            get
+            {
+                switch (VerticalAlignment)
+                {
+                    case VerticalAlignment.Top:
+                        return 0;
+                    case VerticalAlignment.Bottom:
+                        return Parent.Bounds.Bottom - Height;
+                    case VerticalAlignment.Center:
+                        return (Parent.Bounds.Bottom - Height) / 2;
+                    default:
+                        return _y;
+                }
+            }
             set
             {
                 _y = value;
@@ -73,10 +116,7 @@ namespace Ember.GUI
             }
         }
 
-        public virtual float PrefWidth { get; set; }
-        public virtual float PrefHeight { get; set; }
-
-        public virtual Vector2 Position
+        public Vector2 Position
         {
             get => new Vector2(X, Y);
             set
@@ -85,16 +125,16 @@ namespace Ember.GUI
                 Y = value.Y;
             }
         }
-        public virtual Vector2 AbsolutePosition
+        public Vector2 AbsolutePosition
         {
             get
             {
                 if (Parent != null)
-                    return Parent.AbsolutePosition;
+                    return Parent.AbsolutePosition + Position;
                 return Position;
             }
         }
-        public virtual Vector2 Size
+        public Vector2 Size
         {
             get => new Vector2(Width, Height);
             set
@@ -103,7 +143,7 @@ namespace Ember.GUI
                 Height = value.Y;
             }
         }
-        public virtual RectangleF Bounds
+        public RectangleF Bounds
         {
             get => new RectangleF(Position, Size);
             set
@@ -112,15 +152,25 @@ namespace Ember.GUI
                 Size = new Vector2(value.Width, value.Height);
             }
         }
-        public virtual RectangleF AbsoluteBounds
+        public RectangleF AbsoluteBounds
         {
             get
             {
                 return new RectangleF(AbsolutePosition, Size);
             }
         }
+        public float LayerDepth
+        {
+            get => _layerDepth;
+            set
+            {
+                _layerDepth = value;
+                foreach (Element element in Children)
+                    element.LayerDepth = _layerDepth + DrawLayer.Increment;
+            }
+        }
 
-        public virtual bool IsEnabled { get; set; } = true;
+        public bool IsEnabled { get; set; } = true;
 
         public Action Moved;
         public Action Resized;
@@ -129,6 +179,8 @@ namespace Ember.GUI
         public Action Pressed;
         public Action Released;
 
+        protected virtual void OnUpdate(GameTime gameTime) { }
+        protected virtual void OnDraw(SpriteBatch spriteBatch, GameTime gameTime) { }
         protected virtual void OnMove() { }
         protected virtual void OnResize() { }
         protected virtual void OnHover() { }
@@ -140,6 +192,7 @@ namespace Ember.GUI
         {
             if (IsEnabled)
             {
+                OnUpdate(gameTime);
                 foreach (Element child in Children)
                 {
                     if (child.IsEnabled)
@@ -151,12 +204,26 @@ namespace Ember.GUI
         {
             if (IsEnabled)
             {
+                OnDraw(spriteBatch, gameTime);
                 foreach (Element child in Children)
                 {
                     if (child.IsEnabled)
                         child.Draw(spriteBatch, gameTime);
                 }
             }
+        }
+
+        public void AddChild(Element element)
+        {
+            element.Parent = this;
+            if (element.LayerDepth < LayerDepth)
+                element.LayerDepth = LayerDepth + DrawLayer.Increment;
+            Children.Add(element);
+        }
+        public void RemoveChild(Element element)
+        {
+            element.Parent = null;
+            Children.Remove(element);
         }
     }
 }

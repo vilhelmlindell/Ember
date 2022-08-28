@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Ember.Graphics;
 
-namespace Ember.GUI
+namespace Ember.UI
 {
     public class Image : Element
     {

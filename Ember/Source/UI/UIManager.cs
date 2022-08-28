@@ -2,11 +2,11 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Ember.GUI
+namespace Ember.UI
 {
-    public class GUIManager : Element
+    public class UIManager : Element
     {
-        public GUIManager(Viewport viewport)
+        public UIManager(Viewport viewport)
         {
             Width = viewport.Width;
             Height = viewport.Height;
@@ -22,7 +22,7 @@ namespace Ember.GUI
         }
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp);
             base.Draw(spriteBatch, gameTime);
             spriteBatch.End();
         }

@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 using FontStashSharp;
 using Ember.Graphics;
 
-namespace Ember.GUI
+namespace Ember.UI
 {
-    public class TextBox : Widget
+    public class TextBox : Element
     {
         public float Rotation;
         public Vector2? Scale;

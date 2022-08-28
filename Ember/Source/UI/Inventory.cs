@@ -4,13 +4,14 @@ using Microsoft.Xna.Framework.Input;
 using Ember.Graphics;
 using Ember.Items;
 
-namespace Ember.GUI
+namespace Ember.UI
 {
     public class Inventory : Element
     {
         public int Columns;
         public int Rows;
 
+        private Image[] _itemFrames;
         private ItemSlot[] _itemSlots;
         private bool _isInventoryOpen;
         private int _selectedIndex = -1;
@@ -20,6 +21,7 @@ namespace Ember.GUI
             Columns = Math.Max(columns, 1);
             Rows = Math.Max(rows, 1);
 
+            _itemFrames = new Image[Columns * Rows];
             _itemSlots = new ItemSlot[Columns * Rows];
 
             for (int row = 0; row < Rows; row++)
@@ -28,17 +30,24 @@ namespace Ember.GUI
                 {
                     Image image = new Image(elementSprite);
                     image.X = column * (elementWidth + columnMargin);
-                    image.Y = row * (elementHeight + columnMargin);
+                    image.Y = row * (elementHeight + rowMargin);
                     image.Width = elementWidth;
                     image.Height = elementHeight;
+                    _itemFrames[row * Columns + column] = image;
                     ItemSlot itemSlot = new ItemSlot();
-                    image.Children.Add(itemSlot.Image);
-                    itemSlot.Image.Width = 16;
-                    itemSlot.Image.Height = 16;
+                    itemSlot.HorizontalAlignment = HorizontalAlignment.Center;
+                    itemSlot.VerticalAlignment = VerticalAlignment.Center;
+                    itemSlot.Width = 16;
+                    itemSlot.Height = 16;
                     _itemSlots[row * Columns + column] = itemSlot;
-                    Children.Add(image);
+                    itemSlot.LayerDepth = DrawLayer.UI + DrawLayer.Increment * 2;
+                    image.AddChild(itemSlot);
+                    AddChild(image);
                 }
             }
+
+            Width = Columns * (elementWidth + columnMargin - 1);
+            Height = Rows * (elementHeight + rowMargin - 1);
         }
 
         public bool IsInventoryOpen
@@ -61,11 +70,8 @@ namespace Ember.GUI
             {
                 for (int i = 0; i < _itemSlots.Length; i++)
                 {
-                    if (_itemSlots[i].Image == null) continue;
-
-                    if (_itemSlots[i].Image.IsHovered)
+                    if (_itemFrames[i].IsHovered && _itemSlots[i].ItemStack != null)
                     {
-                        Console.WriteLine("test");
                         _selectedIndex = i;
                     }
                 }
@@ -73,8 +79,11 @@ namespace Ember.GUI
 
             if (_selectedIndex != -1)
             {
-                _itemSlots[_selectedIndex].Image.Position = Input.MousePosition;
+                if (_itemSlots[_selectedIndex].Sprite == null) return;
+
+                _itemSlots[_selectedIndex].Position = Input.MousePosition;
             }
+            base.Update(gameTime);
         }
 
         public void AddItemStack(ItemStack itemStack, int column, int row)

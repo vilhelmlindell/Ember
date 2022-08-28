@@ -8,7 +8,7 @@ using Ember.Graphics;
 using Ember.Animations;
 using Ember.Tiles;
 using Ember.Items;
-using Ember.GUI;
+using Ember.UI;
 
 namespace Ember
 {
@@ -30,7 +30,7 @@ namespace Ember
         private Entity _player;
         private Entity _tilemap;
 
-        private GUIManager _guiManager;
+        private UIManager _guiManager;
         private Inventory _inventory;
 
         public Main()
@@ -47,10 +47,9 @@ namespace Ember
             _world = new World(64);
             _player = _world.EntityManager.CreateEntity();
             _tilemap = _world.EntityManager.CreateEntity();
-            _guiManager = new GUIManager(GraphicsDevice.Viewport);
+            _guiManager = new UIManager(GraphicsDevice.Viewport);
             _inventory = new Inventory(8, 4, 32, 32, 8, 8, new Sprite(Content.Load<Texture2D>("Assets/Sprites/ItemFrame")));
-            _guiManager.Children.Add(_inventory);
-
+            _guiManager.AddChild(_inventory);
 
             base.Initialize();
         }

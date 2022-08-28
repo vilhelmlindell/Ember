@@ -12,11 +12,6 @@
 	<ApplicationManifest>app.manifest</ApplicationManifest>
 	<ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
-	<ItemGroup>
-	  <Compile Remove="Source\UI\**" />
-	  <EmbeddedResource Remove="Source\UI\**" />
-	  <None Remove="Source\UI\**" />
-	</ItemGroup>
   <ItemGroup>
 	<None Remove="Icon.ico" />
 	<None Remove="Icon.bmp" />
