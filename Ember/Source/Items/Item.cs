@@ -6,7 +6,7 @@ namespace Ember.Items
 {
     public class Item
     {
-        public static Item[] Items = new Item[ItemID.Count];
+        public static readonly Item[] Items = new Item[ItemID.Count];
 
         public string Name;
         public int MaxCount;

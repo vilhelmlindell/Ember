@@ -5,26 +5,26 @@ namespace Ember.ECS.Systems
 {
     public class System : ISystem
     {
-        protected World _world;
-        protected Filter _filter;
-        protected readonly List<Entity> _activeEntities;
-        protected bool _rebuildActives;
+        protected readonly World World;
+        protected readonly Filter Filter;
+        private readonly List<Entity> _activeEntities;
+        private bool _rebuildActives;
 
         public System(World world, Filter filter)
         {
-            _world = world;
-            _filter = filter;
+            World = world;
+            Filter = filter;
             _activeEntities = new List<Entity>();
             _rebuildActives = true;
 
-            _world.EntityManager.EntityCreated += OnEntityCreated;
-            _world.EntityManager.EntityDestroyed += OnEntityDestroyed;
-            _world.EntityManager.EntityChanged += OnEntityChanged;
+            World.EntityManager.EntityCreated += OnEntityCreated;
+            World.EntityManager.EntityDestroyed += OnEntityDestroyed;
+            World.EntityManager.EntityChanged += OnEntityChanged;
         }
 
-        public virtual bool IsEnabled { get; set; } = true;
+        public bool IsEnabled { get; set; } = true;
 
-        public virtual List<Entity> ActiveEntities
+        public List<Entity> ActiveEntities
         {
             get
             {
@@ -49,9 +49,9 @@ namespace Ember.ECS.Systems
 
         protected void OnEntityAdded(Entity entity) { }
         protected void OnEntityRemoved(Entity entity) { }
-        protected virtual void OnEntityCreated(Entity entity)
+        protected void OnEntityCreated(Entity entity)
         {
-            if (_filter.MeetsRequirements(entity))
+            if (Filter.MeetsRequirements(entity))
             {
                 _activeEntities.Add(entity);
                 OnEntityAdded(entity);
@@ -59,14 +59,14 @@ namespace Ember.ECS.Systems
             else
                 OnEntityRemoved(entity);
         }
-        protected virtual void OnEntityDestroyed(Entity entity) => _rebuildActives = true;
-        protected virtual void OnEntityChanged(Entity entity) => _rebuildActives = true;
+        protected void OnEntityDestroyed(Entity entity) => _rebuildActives = true;
+        protected void OnEntityChanged(Entity entity) => _rebuildActives = true;
 
-        protected virtual void RebuildActives()
+        protected void RebuildActives()
         {
             _activeEntities.Clear();
 
-            foreach (Entity entity in _world.EntityManager.Entities)
+            foreach (var entity in World.EntityManager.Entities)
             {
                 OnEntityCreated(entity);
             }

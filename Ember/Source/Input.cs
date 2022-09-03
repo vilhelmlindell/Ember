@@ -46,8 +46,8 @@ namespace Ember
             };
         }
 
-        public static Vector2 MousePosition => new Vector2(_mouseState.X, _mouseState.Y);
-        public static Vector2 PreviousMousePosition => new Vector2(_previousMouseState.X, _previousMouseState.Y);
+        public static Vector2 MousePosition => new(_mouseState.X, _mouseState.Y);
+        public static Vector2 PreviousMousePosition => new(_previousMouseState.X, _previousMouseState.Y);
         public static int ScrollWheelValue => _mouseState.ScrollWheelValue;
         public static int PreviousScrollWheelValue => _previousMouseState.ScrollWheelValue;
 

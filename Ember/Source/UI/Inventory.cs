@@ -6,7 +6,7 @@ using Ember.Items;
 
 namespace Ember.UI
 {
-    public class Inventory : Element
+    public sealed class Inventory : Element
     {
         public int Columns;
         public int Rows;

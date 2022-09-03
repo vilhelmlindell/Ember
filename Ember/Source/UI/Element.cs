@@ -31,9 +31,9 @@ namespace Ember.UI
     {
         public Element Parent;
         public List<Element> Children = new List<Element>();
+        public Vector2 Origin;
         public HorizontalAlignment HorizontalAlignment = HorizontalAlignment.None;
         public VerticalAlignment VerticalAlignment = VerticalAlignment.None;
-        public Vector2 Origin;
         public bool IsHovered;
         public bool IsHeld;
 
@@ -60,11 +60,11 @@ namespace Ember.UI
                 switch(HorizontalAlignment)
                 {
                     case HorizontalAlignment.Left:
-                        return 0;
+                        return _x;
                     case HorizontalAlignment.Right:
-                        return Parent.Bounds.Right - Width;
+                        return Parent.Bounds.Right - Width + _x;
                     case HorizontalAlignment.Center:
-                        return (Parent.Bounds.Right - Width) / 2;
+                        return (Parent.Bounds.Right - Width) / 2 + _x;
                     default:
                         return _x;
                 }
@@ -82,11 +82,11 @@ namespace Ember.UI
                 switch (VerticalAlignment)
                 {
                     case VerticalAlignment.Top:
-                        return 0;
+                        return _y;
                     case VerticalAlignment.Bottom:
-                        return Parent.Bounds.Bottom - Height;
+                        return Parent.Bounds.Bottom - Height + _y;
                     case VerticalAlignment.Center:
-                        return (Parent.Bounds.Bottom - Height) / 2;
+                        return (Parent.Bounds.Bottom - Height) / 2 + _y;
                     default:
                         return _y;
                 }
@@ -118,7 +118,7 @@ namespace Ember.UI
 
         public Vector2 Position
         {
-            get => new Vector2(X, Y);
+            get => new (X, Y);
             set
             {
                 X = value.X;
@@ -136,7 +136,7 @@ namespace Ember.UI
         }
         public Vector2 Size
         {
-            get => new Vector2(Width, Height);
+            get => new(Width, Height);
             set
             {
                 Width = value.X;
@@ -152,13 +152,8 @@ namespace Ember.UI
                 Size = new Vector2(value.Width, value.Height);
             }
         }
-        public RectangleF AbsoluteBounds
-        {
-            get
-            {
-                return new RectangleF(AbsolutePosition, Size);
-            }
-        }
+        public RectangleF AbsoluteBounds => new RectangleF(AbsolutePosition, Size);
+
         public float LayerDepth
         {
             get => _layerDepth;
@@ -227,3 +222,4 @@ namespace Ember.UI
         }
     }
 }
+
