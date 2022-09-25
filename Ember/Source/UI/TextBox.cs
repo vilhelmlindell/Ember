@@ -9,10 +9,11 @@ namespace Ember.UI
 {
     public class TextBox : Element
     {
-        public float Rotation;
         public Vector2? Scale;
         public Color Color = Color.White;
         public Color[] CharacterColors;
+        public float Rotation;
+        
         private FontSystem _fontSystem = new FontSystem();
         private FontSystemSettings _fontSettings;
         private byte[] _font;
@@ -22,7 +23,8 @@ namespace Ember.UI
         private string _text;
         private string _textToDraw;
 
-        public TextBox(byte[] font = null, string text = "", int fontSize = 10, int characterSpacing = 0, int lineSpacing = 0)
+        public TextBox(UIManager uiManager, byte[] font = null, string text = "", int fontSize = 10,
+            int characterSpacing = 0, int lineSpacing = 0) : base(uiManager)
         {
             if (font != null)
                 Font = font;
@@ -37,10 +39,7 @@ namespace Ember.UI
 
         public byte[] Font
         {
-            get
-            {
-                return _font;
-            }
+            get => _font;
             set
             {
                 _font = value;
@@ -50,7 +49,7 @@ namespace Ember.UI
         } 
         public string Text
         {
-            get { return _text; }
+            get => _text;
             set
             {
                 _text = value;
@@ -59,7 +58,7 @@ namespace Ember.UI
         }
         public int FontSize
         {
-            get { return _fontSize; }
+            get => _fontSize;
             set
             {
                 _fontSize = value;
@@ -68,7 +67,7 @@ namespace Ember.UI
         }
         public int CharacterSpacing
         {
-            get { return _characterSpacing; }
+            get => _characterSpacing;
             set
             {
                 _characterSpacing = value;
@@ -77,29 +76,23 @@ namespace Ember.UI
         }
         public int LineSpacing
         {
-            get { return _lineSpacing; }
+            get => _lineSpacing;
             set
             {
                 _lineSpacing = value;
                 FormatTextToBounds();
             }
         }
-        public SpriteFontBase SpriteFont
-        {
-            get
-            {
-                return _fontSystem.GetFont(FontSize);
-            }
-        }
         public FontSystemSettings FontSettings
         {
-            get { return _fontSettings; }
+            get => _fontSettings;
             set
             {
                 _fontSettings = value;
                 _fontSystem = new FontSystem(value);
             }
         }
+        public SpriteFontBase SpriteFont => _fontSystem.GetFont(FontSize);
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
@@ -115,7 +108,7 @@ namespace Ember.UI
             }
         }
 
-        public void FormatTextToBounds()
+        private void FormatTextToBounds()
         {
             if (SpriteFont.MeasureString(_text, Scale, CharacterSpacing, LineSpacing).X > Width)
             {

@@ -4,23 +4,32 @@ namespace Ember.UI
 {
     public class ItemSlot : Image
     {
-        private TextBox _countTextBox = new TextBox();
+        public TextBox CountTextBox;
         private ItemStack _itemStack;
 
-        public ItemSlot()
+        public ItemSlot(UIManager uiManager) : base(uiManager)
         {
-            _countTextBox.FontSize = 20;
-            AddChild(_countTextBox);
+            CountTextBox = new TextBox(uiManager);
+            CountTextBox.FontSize = 20;
+            AddChild(CountTextBox);
         }
 
         public ItemStack ItemStack
         {
-            get { return _itemStack; }
+            get => _itemStack;
             set
             {
                 _itemStack = value;
-                Sprite = _itemStack.Item.Sprite;
-                _countTextBox.Text = _itemStack.Count.ToString();
+                if (value != null)
+                {
+                    Sprite = _itemStack.Item.Sprite;
+                    CountTextBox.Text = _itemStack.Count.ToString();
+                }
+                else
+                {
+                    Sprite = null;
+                    CountTextBox.Text = "";
+                }
             }
         }
     }

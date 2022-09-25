@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Ember.UI
 {
-    public class UIManager : Element
+    public sealed class UIManager : Element
     {
         public UIManager(Viewport viewport)
         {

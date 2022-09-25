@@ -12,20 +12,24 @@ namespace Ember.UI
         public SpriteEffects SpriteEffect = SpriteEffects.None;
         public float Rotation;
 
-        public Image() { }
-        public Image(Sprite sprite)
+        public Image(UIManager uiManager, Sprite sprite = null) : base(uiManager)
         {
             Sprite = sprite;
-            Width = sprite.Texture.Width;
-            Height = sprite.Texture.Height;
+            
+            if (sprite != null)
+            {
+                Width = sprite.Texture.Width;
+                Height = sprite.Texture.Height;
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            if (Sprite == null) return;
-
-            spriteBatch.Draw(Sprite.Texture, AbsoluteBounds.Rectangle, Sprite.SourceRectangle, 
-                             Color, Rotation, Origin, SpriteEffect, LayerDepth);
+            if (Sprite != null)
+            {
+                spriteBatch.Draw(Sprite.Texture, AbsoluteBounds.Rectangle, Sprite.SourceRectangle,
+                    Color, Rotation, Origin, SpriteEffect, LayerDepth);
+            }
 
             base.Draw(spriteBatch, gameTime);
         }

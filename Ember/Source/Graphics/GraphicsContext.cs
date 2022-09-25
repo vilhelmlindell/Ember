@@ -18,6 +18,11 @@ namespace Ember.Graphics
             public float LayerDepth;
             public Effect Effect;
 
+            public SpriteDrawCall(Sprite sprite)
+            {
+                Sprite = sprite;
+            }
+
             public static int CompareByEffect(SpriteDrawCall x, SpriteDrawCall y)
             {
                 return x.Effect.Equals(y.Effect) ? 0 : 1;

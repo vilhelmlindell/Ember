@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,12 +7,6 @@ using Ember.Graphics;
 
 namespace Ember.UI
 {
-    public enum ButtonState
-    {
-        None,
-        Hovered,
-        Held
-    }
     public enum HorizontalAlignment
     {
         None,
@@ -26,11 +21,34 @@ namespace Ember.UI
         Bottom,
         Center
     }
+    public enum LayoutBehaviour
+    {
+        Static, 
+        Dynamic
+    }
+
+    public class LengthUnit
+    {
+        public enum Parameter
+        {
+            X,
+            Y,
+            Width,
+            Height
+        }
+        
+        public float Value;
+        public bool IsRelative;
+
+        public LengthUnit(float value)
+        {
+        }
+    }
 
     public class Element
     {
-        public Element Parent;
-        public List<Element> Children = new List<Element>();
+        public readonly UIManager UIManager;
+        public List<Element> Children = new();
         public Vector2 Origin;
         public HorizontalAlignment HorizontalAlignment = HorizontalAlignment.None;
         public VerticalAlignment VerticalAlignment = VerticalAlignment.None;
@@ -42,7 +60,20 @@ namespace Ember.UI
         private float _width;
         private float _height;
         private float _layerDepth = DrawLayer.UI;
-
+        private bool _isLayoutInvalid;
+        private List<Element> _childrenToAdd = new List<Element>();
+        private List<Element> _childrenToRemove = new List<Element>();
+        
+        public Element(UIManager uiManager)
+        {
+            UIManager = uiManager;
+            Moved += OnMove;
+            Resized += OnResize;
+            Hovered += OnHover;
+            Unhovered += OnUnhover;
+            Pressed += OnPress;
+            Released += OnRelease;
+        }
         public Element()
         {
             Moved += OnMove;
@@ -153,6 +184,8 @@ namespace Ember.UI
             }
         }
         public RectangleF AbsoluteBounds => new RectangleF(AbsolutePosition, Size);
+        
+        public Element Parent { get; private set; }
 
         public float LayerDepth
         {
@@ -161,7 +194,8 @@ namespace Ember.UI
             {
                 _layerDepth = value;
                 foreach (Element element in Children)
-                    element.LayerDepth = _layerDepth + DrawLayer.Increment;
+                    if (element.LayerDepth <= LayerDepth)
+                        element.LayerDepth = LayerDepth + DrawLayer.Increment;
             }
         }
 
@@ -194,6 +228,17 @@ namespace Ember.UI
                         child.Update(gameTime);
                 }
             }
+            Children = Children.Except(_childrenToRemove).ToList();
+            Children.AddRange(_childrenToAdd);
+            foreach (Element child in _childrenToAdd)
+            {
+                if (child.LayerDepth <= LayerDepth)
+                    child.LayerDepth = LayerDepth + DrawLayer.Increment;
+                Children.Add(child);
+            }
+            
+            _childrenToAdd.Clear();
+            _childrenToRemove.Clear();
         }
         public virtual void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
@@ -211,14 +256,14 @@ namespace Ember.UI
         public void AddChild(Element element)
         {
             element.Parent = this;
-            if (element.LayerDepth < LayerDepth)
+            if (element.LayerDepth <= LayerDepth)
                 element.LayerDepth = LayerDepth + DrawLayer.Increment;
-            Children.Add(element);
+            _childrenToAdd.Add(element);
         }
         public void RemoveChild(Element element)
         {
-            element.Parent = null;
-            Children.Remove(element);
+            _childrenToRemove.Add(element);
+            UIManager.AddChild(element);
         }
     }
 }

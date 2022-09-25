@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Ember.ECS;
@@ -30,7 +32,7 @@ namespace Ember
         private Entity _player;
         private Entity _tilemap;
 
-        private UIManager _guiManager;
+        private UIManager _uiManager;
         private Inventory _inventory;
 
         public Main()
@@ -47,9 +49,9 @@ namespace Ember
             _world = new World(64);
             _player = _world.EntityManager.CreateEntity();
             _tilemap = _world.EntityManager.CreateEntity();
-            _guiManager = new UIManager(GraphicsDevice.Viewport);
-            _inventory = new Inventory(8, 4, 32, 32, 8, 8, new Sprite(Content.Load<Texture2D>("Assets/Sprites/ItemFrame")));
-            _guiManager.AddChild(_inventory);
+            _uiManager = new UIManager(GraphicsDevice.Viewport);
+            _inventory = new Inventory(_uiManager, 8, 4, 32, 32, 8, 8, new Sprite(Content.Load<Texture2D>("Assets/Sprites/ItemFrame")));
+            _uiManager.AddChild(_inventory);
 
             base.Initialize();
         }
@@ -127,7 +129,7 @@ namespace Ember
             Input.Update();
 
             _world.Update(gameTime);
-            _guiManager.Update(gameTime);
+            _uiManager.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -137,8 +139,7 @@ namespace Ember
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _world.Draw(gameTime);
-
-            _guiManager.Draw(_spriteBatch, gameTime);
+            _uiManager.Draw(_spriteBatch, gameTime);
 
             base.Draw(gameTime);
         }
