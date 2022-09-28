@@ -24,14 +24,14 @@ namespace Ember.ECS.Systems
             {
                 Vector2 worldMousePosition = _camera.ScreenToWorld(Input.MousePosition);
                 Vector2Int tilePosition = player.Tilemap.GetTileCoords(worldMousePosition);
-                player.Tilemap.SetTile(tilePosition, TileID.Air);
+                player.Tilemap.SetTile(tilePosition, TileId.Air);
                 Console.WriteLine(tilePosition.X + " " + tilePosition.Y);
             }
             if (Input.MousePressed(MouseButton.Right))
             {
                 Vector2 worldMousePosition = _camera.ScreenToWorld(Input.MousePosition);
                 Vector2Int tilePosition = player.Tilemap.GetTileCoords(worldMousePosition);
-                player.Tilemap.SetTile(tilePosition, TileID.Grass);
+                player.Tilemap.SetTile(tilePosition, TileId.Grass);
             }
         }
     }

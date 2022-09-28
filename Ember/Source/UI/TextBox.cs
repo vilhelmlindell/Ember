@@ -7,7 +7,7 @@ using Ember.Graphics;
 
 namespace Ember.UI
 {
-    public class TextBox : Element
+    public class TextBox : Control
     {
         public Vector2? Scale;
         public Color Color = Color.White;
@@ -23,7 +23,7 @@ namespace Ember.UI
         private string _text;
         private string _textToDraw;
 
-        public TextBox(UIManager uiManager, byte[] font = null, string text = "", int fontSize = 10,
+        public TextBox(UiManager uiManager, byte[] font = null, string text = "", int fontSize = 10,
             int characterSpacing = 0, int lineSpacing = 0) : base(uiManager)
         {
             if (font != null)
@@ -94,7 +94,7 @@ namespace Ember.UI
         }
         public SpriteFontBase SpriteFont => _fontSystem.GetFont(FontSize);
 
-        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        protected override void OnDraw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             if (CharacterColors != null)
             {

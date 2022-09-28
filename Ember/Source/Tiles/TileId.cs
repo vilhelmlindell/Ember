@@ -1,6 +1,6 @@
-﻿namespace Ember.Items
+﻿namespace Ember.Tiles
 {
-    public static class ItemID
+    public static class TileId
     {
         public const int Air = 0;
         public const int Grass = 1;

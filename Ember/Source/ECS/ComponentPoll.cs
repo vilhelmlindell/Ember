@@ -4,26 +4,26 @@ namespace Ember.ECS
 {
     public interface IComponentPool 
     {
-        public void Add(long entityID, object component);
-        public void Remove(long entityID);
+        public void Add(long entityId, object component);
+        public void Remove(long entityId);
     }
 
     public class ComponentPool<T> : IComponentPool
     {
-        public Dictionary<long, T> ComponentsByEntityID;
+        public Dictionary<long, T> ComponentsByEntityId;
 
         public ComponentPool()
         {
-            ComponentsByEntityID = new Dictionary<long, T>();
+            ComponentsByEntityId = new Dictionary<long, T>();
         }
 
-        public void Add(long entityID, object component)
+        public void Add(long entityId, object component)
         {
-            ComponentsByEntityID.Add(entityID, (T)component);
+            ComponentsByEntityId.Add(entityId, (T)component);
         }
-        public void Remove(long entityID)
+        public void Remove(long entityId)
         {
-            ComponentsByEntityID.Remove(entityID);
+            ComponentsByEntityId.Remove(entityId);
         }
     }
 }

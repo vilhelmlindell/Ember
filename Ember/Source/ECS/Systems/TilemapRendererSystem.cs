@@ -39,20 +39,19 @@ namespace Ember.ECS.Systems
             {
                 for (int y = 0; y < tilemap.Height; y++)
                 {
-                    int tileID = tilemap.GetTile(x, y);
-                    Sprite sprite = Tile.Tiles[tileID].Sprite;
-                    if (sprite != null)
+                    int tileId = tilemap.GetTile(x, y);
+                    Sprite sprite = Tile.Tiles[tileId].Sprite;
                     {
                         Vector2 tilePosition = new Vector2(x * tilemap.TileWidth, y * tilemap.TileHeight);
                         _spriteBatch.Draw(sprite.Texture, 
-                                          tilePosition, 
-                                          sprite.SourceRectangle, 
-                                          Color.White, 
-                                          0f, 
-                                          Vector2.Zero, 
-                                          new Vector2(2, 2), 
-                                          SpriteEffects.None, 
-                                          DrawLayer.Default);
+                            tilePosition, 
+                            sprite.SourceRectangle, 
+                            Color.White, 
+                            0f, 
+                            Vector2.Zero, 
+                            new Vector2(2, 2), 
+                            SpriteEffects.None, 
+                            DrawLayer.Default);
                     }
                 }
             }

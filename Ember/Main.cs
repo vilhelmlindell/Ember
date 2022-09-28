@@ -32,13 +32,13 @@ namespace Ember
         private Entity _player;
         private Entity _tilemap;
 
-        private UIManager _uiManager;
+        private UiManager _uiManager;
         private Inventory _inventory;
 
         public Main()
         {
             _graphics = new GraphicsDeviceManager(this);
-            Directory.SetCurrentDirectory("C:/Dev/MonoGame/Ember/Ember/Content");
+            Directory.SetCurrentDirectory("/home/vilhelm/dev/csharp/Ember/Ember");
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -49,9 +49,9 @@ namespace Ember
             _world = new World(64);
             _player = _world.EntityManager.CreateEntity();
             _tilemap = _world.EntityManager.CreateEntity();
-            _uiManager = new UIManager(GraphicsDevice.Viewport);
-            _inventory = new Inventory(_uiManager, 8, 4, 32, 32, 8, 8, new Sprite(Content.Load<Texture2D>("Assets/Sprites/ItemFrame")));
-            _uiManager.AddChild(_inventory);
+            _uiManager = new UiManager(GraphicsDevice.Viewport);
+            //_inventory = new Inventory(_uiManager, 8, 4, 32, 32, 8, 8, new Sprite(Content.Load<Texture2D>("Assets/Sprites/ItemFrame")));
+            //_uiManager.AddChild(_inventory);
 
             base.Initialize();
         }
@@ -64,14 +64,14 @@ namespace Ember
             Item.LoadItems(Content);
             Tile.LoadTiles(Content);
 
-            _inventory.AddItemStack(new ItemStack(Item.Items[ItemID.Grass]), 0);
+            _inventory.AddItemStack(new ItemStack(Item.Items[ItemId.Grass]), 0);
 
-            Tilemap tilemap = new Tilemap(100, 100, 32);
-            for (int x = 0; x < 10; x++)
+            Tilemap tilemap = new Tilemap(200, 200, 32);
+            for (int x = 0; x < 200; x++)
             {
-                for (int y = 6; y < 10; y++)
+                for (int y = 6; y < 200; y++)
                 {
-                    tilemap.SetTile(x, y, TileID.Grass);
+                    tilemap.SetTile(x, y, TileId.Grass);
                 }
             }
 
@@ -86,7 +86,7 @@ namespace Ember
             _player.AddComponent(sprite);
             var spriteAnimator = new SpriteAnimator()
             {
-                Animation = AnimationParser.LoadJson("Assets/Animations/Slime.json")
+                Animation = AnimationParser.LoadJson("Content/Assets/Animations/Slime.json")
             };
             spriteAnimator.Play("Idle");
             _player.AddComponent(spriteAnimator);
@@ -128,7 +128,7 @@ namespace Ember
         {
             Input.Update();
 
-            _world.Update(gameTime);
+            //_world.Update(gameTime);
             _uiManager.Update(gameTime);
 
             base.Update(gameTime);
@@ -138,7 +138,7 @@ namespace Ember
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _world.Draw(gameTime);
+            //_world.Draw(gameTime);
             _uiManager.Draw(_spriteBatch, gameTime);
 
             base.Draw(gameTime);

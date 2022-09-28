@@ -21,11 +21,11 @@ namespace Ember.Graphics
         {
             _game = game ?? throw new ArgumentNullException("game");
 
-            const int MaxVertexCount = 1024;
-            const int MaxIndexCount = MaxVertexCount * 3;
+            const int maxVertexCount = 1024;
+            const int maxIndexCount = maxVertexCount * 3;
 
-            _vertices = new VertexPositionColor[MaxVertexCount];
-            _indices = new int[MaxIndexCount];
+            _vertices = new VertexPositionColor[maxVertexCount];
+            _indices = new int[maxIndexCount];
         }
 
         public void Begin()

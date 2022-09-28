@@ -7,7 +7,7 @@ using Ember.Items;
 
 namespace Ember.UI
 {
-    public sealed class Inventory : Element
+    public sealed class Inventory : Control
     {
         public int Columns;
         public int Rows;
@@ -17,7 +17,7 @@ namespace Ember.UI
         private bool _isInventoryOpen;
         private int _selectedIndex = -1;
 
-        public Inventory(UIManager uiManager, int columns, int rows, int elementWidth, int elementHeight,
+        public Inventory(UiManager uiManager, int columns, int rows, int elementWidth, int elementHeight,
             int columnMargin, int rowMargin, Sprite elementSprite) : base(uiManager)
         {
             Columns = Math.Max(columns, 1);
@@ -42,7 +42,7 @@ namespace Ember.UI
                     itemSlot.Width = 16;
                     itemSlot.Height = 16;
                     _itemSlots[row * Columns + column] = itemSlot;
-                    itemSlot.LayerDepth = DrawLayer.UI + DrawLayer.Increment * 2;
+                    itemSlot.LayerDepth = DrawLayer.Ui + DrawLayer.Increment * 2;
                     image.AddChild(itemSlot);
                     AddChild(image);
                 }
@@ -63,7 +63,7 @@ namespace Ember.UI
             }
         }
 
-        public override void Update(GameTime gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             if (Input.KeyPressed(Keys.Escape))
                 ToggleInventory();
@@ -108,8 +108,6 @@ namespace Ember.UI
 
                 }
             }
-
-            base.Update(gameTime);
         }
         
         public void AddItemStack(ItemStack itemStack, int index)

@@ -7,7 +7,7 @@ namespace Ember.UI
         public TextBox CountTextBox;
         private ItemStack _itemStack;
 
-        public ItemSlot(UIManager uiManager) : base(uiManager)
+        public ItemSlot(UiManager uiManager) : base(uiManager)
         {
             CountTextBox = new TextBox(uiManager);
             CountTextBox.FontSize = 20;

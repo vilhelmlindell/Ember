@@ -14,10 +14,10 @@ namespace Ember.ECS
         }
         private Entity(long id)
         {
-            ID = id;
+            Id = id;
         }
 
-        public long ID
+        public long Id
         {
             get 
             { 

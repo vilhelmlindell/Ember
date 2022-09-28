@@ -24,7 +24,7 @@ namespace Ember.ECS
             {
                 int newIndex = _freeEntityIndices[_freeEntityIndices.Count - 1];
                 _freeEntityIndices.RemoveAt(newIndex);
-                Entities[newIndex].ID = Entity.CreateId(newIndex, Entities[newIndex].Version);
+                Entities[newIndex].Id = Entity.CreateId(newIndex, Entities[newIndex].Version);
                 return Entities[newIndex];
             }
             Entity entity = new Entity(Entities.Count, 0, _world);
@@ -34,7 +34,7 @@ namespace Ember.ECS
         }
         public void DestroyEntity(Entity entity)
         {
-            entity.ID = Entity.CreateId(-1, entity.Version + 1);
+            entity.Id = Entity.CreateId(-1, entity.Version + 1);
             entity.ComponentBits.SetAll(false);
             _freeEntityIndices.Add(entity.Index);
 
@@ -42,7 +42,7 @@ namespace Ember.ECS
             {
                 if (entity.ComponentBits[i])
                 {
-                    _world.ComponentManager.ComponentPools[i].Remove(entity.ID);
+                    _world.ComponentManager.ComponentPools[i].Remove(entity.Id);
                 }
             }
             EntityDestroyed?.Invoke(entity);

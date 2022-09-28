@@ -6,7 +6,7 @@ namespace Ember.ECS
     public class ComponentManager
     {
         public readonly IComponentPool[] ComponentPools;
-        private readonly Dictionary<Type, int> _componentTypesByComponentID;
+        private readonly Dictionary<Type, int> _componentTypesByComponentId;
         private readonly Dictionary<int, Type> _componentIDsByComponentType;
         private readonly World _world;
 
@@ -14,68 +14,68 @@ namespace Ember.ECS
         {
             _world = world;
             ComponentPools = new IComponentPool[world.MaxComponentTypes];
-            _componentTypesByComponentID = new Dictionary<Type, int>();
+            _componentTypesByComponentId = new Dictionary<Type, int>();
             _componentIDsByComponentType = new Dictionary<int, Type>();
         }
 
         public T AddComponent<T>(Entity entity, T component)
         {
-            if (_world.EntityManager.Entities[entity.Index].ID != entity.ID)
+            if (_world.EntityManager.Entities[entity.Index].Id != entity.Id)
                 return default(T);
 
-            int componentID = GetComponentID<T>();
-            if (!entity.ComponentBits[componentID])
+            int componentId = GetComponentId<T>();
+            if (!entity.ComponentBits[componentId])
             {
-                ComponentPools[componentID].Add(entity.ID, component);
-                entity.ComponentBits.Set(componentID, true);
+                ComponentPools[componentId].Add(entity.Id, component);
+                entity.ComponentBits.Set(componentId, true);
                 _world.EntityManager.EntityChanged?.Invoke(entity);
             }
             return component;
         }
         public T GetComponent<T>(Entity entity)
         {
-            if (_world.EntityManager.Entities[entity.Index].ID != entity.ID)
+            if (_world.EntityManager.Entities[entity.Index].Id != entity.Id)
                 return default;
 
-            int componentID = GetComponentID<T>();
-            if (entity.ComponentBits[componentID])
+            int componentId = GetComponentId<T>();
+            if (entity.ComponentBits[componentId])
             {
-                return ((ComponentPool<T>)ComponentPools[componentID]).ComponentsByEntityID[entity.ID];
+                return ((ComponentPool<T>)ComponentPools[componentId]).ComponentsByEntityId[entity.Id];
             }
             return default;
         }
         public void RemoveComponent<T>(Entity entity)
         {
-            if (_world.EntityManager.Entities[entity.Index].ID != entity.ID)
+            if (_world.EntityManager.Entities[entity.Index].Id != entity.Id)
                 return;
 
-            int componentID = GetComponentID<T>();
-            if (entity.ComponentBits[componentID])
+            int componentId = GetComponentId<T>();
+            if (entity.ComponentBits[componentId])
             {
-                ComponentPools[componentID].Remove(entity.ID);
-                entity.ComponentBits.Set(componentID, false);
+                ComponentPools[componentId].Remove(entity.Id);
+                entity.ComponentBits.Set(componentId, false);
                 _world.EntityManager.EntityChanged?.Invoke(entity);
             }
         }
         public bool HasComponent<T>(Entity entity)
         {
-            int componentID = GetComponentID<T>();
-            return entity.ComponentBits[componentID];
+            int componentId = GetComponentId<T>();
+            return entity.ComponentBits[componentId];
         }
-        public int GetComponentID<T>()
+        public int GetComponentId<T>()
         {
             Type type = typeof(T);
-            if (_componentTypesByComponentID.ContainsKey(type))
+            if (_componentTypesByComponentId.ContainsKey(type))
             {
-                return _componentTypesByComponentID[type];
+                return _componentTypesByComponentId[type];
             }
             return RegisterComponentType<T>();
         }
-        public int GetComponentID(Type type)
+        public int GetComponentId(Type type)
         {
-            if (_componentTypesByComponentID.ContainsKey(type))
+            if (_componentTypesByComponentId.ContainsKey(type))
             {
-                return _componentTypesByComponentID[type];
+                return _componentTypesByComponentId[type];
             }
             return RegisterComponentType(type);
         }
@@ -83,19 +83,19 @@ namespace Ember.ECS
         private int RegisterComponentType<T>()
         {
             Type type = typeof(T);
-            int componentID = _componentIDsByComponentType.Count;
-            _componentTypesByComponentID.Add(type, componentID);
-            _componentIDsByComponentType.Add(componentID, type);
-            ComponentPools[componentID] = new ComponentPool<T>();
-            return componentID;
+            int componentId = _componentIDsByComponentType.Count;
+            _componentTypesByComponentId.Add(type, componentId);
+            _componentIDsByComponentType.Add(componentId, type);
+            ComponentPools[componentId] = new ComponentPool<T>();
+            return componentId;
         }
         private int RegisterComponentType(Type type)
         {
-            int componentID = _componentIDsByComponentType.Count;
-            _componentTypesByComponentID.Add(type, componentID);
-            _componentIDsByComponentType.Add(componentID, type);
-            ComponentPools[componentID] = (IComponentPool)Activator.CreateInstance(typeof(ComponentPool<>).MakeGenericType(type));
-            return componentID;
+            int componentId = _componentIDsByComponentType.Count;
+            _componentTypesByComponentId.Add(type, componentId);
+            _componentIDsByComponentType.Add(componentId, type);
+            ComponentPools[componentId] = (IComponentPool)Activator.CreateInstance(typeof(ComponentPool<>).MakeGenericType(type));
+            return componentId;
         }
     }
 }

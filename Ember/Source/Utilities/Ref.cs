@@ -4,17 +4,17 @@ namespace Ember.Utilities
 {
     public class Ref<T>
     {
-        private readonly Func<T> getter;
-        private readonly Action<T> setter;
+        private readonly Func<T> _getter;
+        private readonly Action<T> _setter;
         public Ref(Func<T> getter, Action<T> setter)
         {
-            this.getter = getter;
-            this.setter = setter;
+            this._getter = getter;
+            this._setter = setter;
         }
         public T Value
         {
-            get { return getter(); }
-            set { setter(value); }
+            get { return _getter(); }
+            set { _setter(value); }
         }
     }
 }

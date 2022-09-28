@@ -5,14 +5,14 @@ using Ember.Graphics;
 
 namespace Ember.UI
 {
-    public class Image : Element
+    public class Image : Control
     {
         public Sprite Sprite;
         public Color Color = Color.White;
         public SpriteEffects SpriteEffect = SpriteEffects.None;
         public float Rotation;
 
-        public Image(UIManager uiManager, Sprite sprite = null) : base(uiManager)
+        public Image(UiManager uiManager, Sprite sprite = null) : base(uiManager)
         {
             Sprite = sprite;
             

@@ -51,14 +51,14 @@ namespace Ember.ECS.Components
         {
             return IsObstacle(tilePosition.X, tilePosition.Y);
         }
-        public void SetTile(int x, int y, int tileID)
+        public void SetTile(int x, int y, int tileId)
         {
             if (x >= 0 && x < Width && y >= 0 && y < Height)
-                _tiles[x, y] = tileID;
+                _tiles[x, y] = tileId;
         }
-        public void SetTile(Vector2Int tilePosition, int tileID)
+        public void SetTile(Vector2Int tilePosition, int tileId)
         {
-            SetTile(tilePosition.X, tilePosition.Y, tileID);
+            SetTile(tilePosition.X, tilePosition.Y, tileId);
         }
     }
 }

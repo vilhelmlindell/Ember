@@ -25,7 +25,7 @@ namespace Ember.ECS
             {
                 foreach (Type type in componentTypes)
                 {
-                    int componentId = _world.ComponentManager.GetComponentID(type);
+                    int componentId = _world.ComponentManager.GetComponentId(type);
                     _includedComponentBits[componentId] = true;
                 }
                 _includedBitsSet = true;
@@ -38,7 +38,7 @@ namespace Ember.ECS
             {
                 foreach (Type type in componentTypes)
                 {
-                    int componentId = _world.ComponentManager.GetComponentID(type);
+                    int componentId = _world.ComponentManager.GetComponentId(type);
                     _excludedComponentBits[componentId] = true;
                 }
                 _excludedBitsSet = false;

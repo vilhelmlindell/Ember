@@ -9,7 +9,7 @@ namespace Ember.Graphics
 
         public static void LoadShaders(ContentManager content, GraphicsDevice graphicsDevice)
         {
-            ClipTransparent = content.Load<Effect>("Assets/Shaders/Effect");
+            //ClipTransparent = content.Load<Effect>("Assets/Shaders/Effect");
         }
     }
 }

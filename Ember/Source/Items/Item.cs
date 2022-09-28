@@ -6,7 +6,7 @@ namespace Ember.Items
 {
     public class Item
     {
-        public static readonly Item[] Items = new Item[ItemID.Count];
+        public static readonly Item[] Items = new Item[ItemId.Count];
 
         public string Name;
         public int MaxCount;
@@ -14,7 +14,7 @@ namespace Ember.Items
 
         public static void LoadItems(ContentManager content)
         {
-            Items[ItemID.Grass] = new Item()
+            Items[ItemId.Grass] = new Item()
             {
                 Name = "Grass tile",
                 MaxCount = 9999,
