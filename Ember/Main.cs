@@ -18,6 +18,7 @@ namespace Ember
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private GraphicsContext _graphicsContext;
 
         private Camera _camera;
         private World _world;
@@ -32,24 +33,23 @@ namespace Ember
         private Entity _player;
         private Entity _tilemap;
 
-        private UiManager _uiManager;
-        private Inventory _inventory;
+        private UIManager _uiManager;
+        private TextBox _textBox;
 
         public Main()
         {
             _graphics = new GraphicsDeviceManager(this);
+            
             Directory.SetCurrentDirectory("/home/vilhelm/dev/csharp/Ember/Ember");
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-        }
-
+        } 
         protected override void Initialize()
         {
             _camera = new Camera(GraphicsDevice.Viewport);
             _world = new World(64);
             _player = _world.EntityManager.CreateEntity();
             _tilemap = _world.EntityManager.CreateEntity();
-            _uiManager = new UiManager(GraphicsDevice.Viewport);
             //_inventory = new Inventory(_uiManager, 8, 4, 32, 32, 8, 8, new Sprite(Content.Load<Texture2D>("Assets/Sprites/ItemFrame")));
             //_uiManager.AddChild(_inventory);
 
@@ -59,12 +59,15 @@ namespace Ember
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _graphicsContext = new GraphicsContext(_graphics.GraphicsDevice, _spriteBatch);
+            
+            _uiManager = new UIManager(GraphicsDevice.Viewport, _graphicsContext);
+            _textBox = new TextBox(Fonts.OpenSans, "Hello World", 20);
+            _uiManager.AddChild(_textBox);
 
             Shaders.LoadShaders(Content, GraphicsDevice);
             Item.LoadItems(Content);
             Tile.LoadTiles(Content);
-
-            _inventory.AddItemStack(new ItemStack(Item.Items[ItemId.Grass]), 0);
 
             Tilemap tilemap = new Tilemap(200, 200, 32);
             for (int x = 0; x < 200; x++)
@@ -139,7 +142,7 @@ namespace Ember
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             //_world.Draw(gameTime);
-            _uiManager.Draw(_spriteBatch, gameTime);
+            _uiManager.Draw(_graphicsContext, gameTime);
 
             base.Draw(gameTime);
         }

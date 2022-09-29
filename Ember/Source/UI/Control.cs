@@ -7,16 +7,16 @@ using Ember.Graphics;
 
 namespace Ember.UI
 {
-    public enum HorizontalAlignment
+    public enum Alignment
     {
+        TopLeft,
+        Top,
+        TopRight,
+        BottomLeft,
+        Bottom,
+        BottomRight,
         Left,
         Right,
-        Center
-    }
-    public enum VerticalAlignment
-    {
-        Top,
-        Bottom,
         Center
     }
     public enum LengthUnit
@@ -25,112 +25,194 @@ namespace Ember.UI
         Percent
     }
 
+
+    public class Length
+    {
+
+        private float _value;
+        private LengthUnit _unit;
+
+        public Length()
+        {
+            _value = 0f;
+            _unit = LengthUnit.Pixels;
+        }
+        public Length(float value = 0f, LengthUnit lengthUnit = LengthUnit.Pixels)
+        {
+            Value = value;
+            Unit = lengthUnit;
+        }
+        
+        public float Value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                WasChanged?.Invoke();
+            }
+        }
+        public LengthUnit Unit
+        {
+            get => _unit;
+            set
+            {
+                _unit = value;
+                WasChanged?.Invoke();
+            }
+        }
+
+        public Action WasChanged;
+
+    }
+
     /// <summary>
-    /// Describes the layout of a control
+    /// Describes the dimensions of a control
     /// </summary>
     public class Layout
     {
-        private float _x;
-        private float _y;
-        private float _width;
-        private float _height;
-        private LengthUnit _xUnit = LengthUnit.Pixels;
-        private LengthUnit _yUnit = LengthUnit.Pixels;
-        private LengthUnit _widthUnit = LengthUnit.Pixels;
-        private LengthUnit _heightUnit = LengthUnit.Pixels;
-        private HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Left;
-        private VerticalAlignment _verticalAlignment = VerticalAlignment.Top;
+        protected bool ShouldCalculateLayout = false;
+        
+        public Layout()
+        {
+            X = new Length();
+            Y = new Length();
+            Width = new Length();
+            Height = new Length();
+            OriginX = new Length();
+            OriginY = new Length();
 
-
-        public float X
-        {
-            get => _x;
-            set { _x = value; LayoutChange?.Invoke(); }
-        }
-        public float Y
-        {
-            get => _y;
-            set { _y = value; LayoutChange?.Invoke(); }
-        }
-        public float Width
-        {
-            get => _width;
-            set { _width = value; LayoutChange?.Invoke(); }
-        }
-        public float Height
-        {
-            get => _height;
-            set { _height = value; LayoutChange?.Invoke(); }
-        }
-        public LengthUnit XUnit
-        {
-            get => _xUnit;
-            set { _xUnit = value; LayoutChange?.Invoke(); }
-        }
-        public LengthUnit YUnit
-        {
-            get => _yUnit;
-            set { _yUnit = value; LayoutChange?.Invoke(); }
-        }
-        public LengthUnit WidthUnit
-        {
-            get => _widthUnit;
-            set { _widthUnit = value; LayoutChange?.Invoke(); }
-        }
-        public LengthUnit HeightUnit
-        {
-            get => _heightUnit;
-            set { _heightUnit = value; LayoutChange?.Invoke(); }
-        }
-        public HorizontalAlignment HorizontalAlignment
-        {
-            get => _horizontalAlignment;
-            set { _horizontalAlignment = value; LayoutChange?.Invoke(); }
-        }
-        public VerticalAlignment VerticalAlignment
-        {
-            get => _verticalAlignment;
-            set { _verticalAlignment = value; LayoutChange?.Invoke(); }
+            X.WasChanged += () => ShouldCalculateLayout = true;
+            Y.WasChanged += () => ShouldCalculateLayout = true;
+            Width.WasChanged += () => ShouldCalculateLayout = true;
+            Height.WasChanged += () => ShouldCalculateLayout = true;
+            OriginX.WasChanged += () => ShouldCalculateLayout = true;
+            OriginY.WasChanged += () => ShouldCalculateLayout = true;
         }
 
-        public Action LayoutChange;
+        public Length X { get; set; }
+        public Length Y { get; set; }
+        public Length Width { get; set; }
+        public Length Height { get; set; }
+        public Length OriginX { get; set; }
+        public Length OriginY { get; set; }
+
+        public void SetPosition(Alignment alignment)
+        {
+            X.Unit = LengthUnit.Percent;
+            Y.Unit = LengthUnit.Percent;
+            switch (alignment)
+            {
+                case Alignment.TopLeft:
+                    X.Value = 0f;
+                    Y.Value = 0f;
+                    break;
+                case Alignment.Top:
+                    X.Value = 0.5f;
+                    Y.Value = 0f;
+                    break;
+                case Alignment.TopRight:
+                    X.Value = 1f;
+                    Y.Value = 0f;
+                    break;
+                case Alignment.BottomLeft:
+                    X.Value = 0f;
+                    Y.Value = 1f;
+                    break;
+                case Alignment.Bottom:
+                    X.Value = 0.5f;
+                    Y.Value = 1f;
+                    break;
+                case Alignment.BottomRight:
+                    X.Value = 1f;
+                    Y.Value = 1f;
+                    break;
+                case Alignment.Left:
+                    X.Value = 0f;
+                    Y.Value = 0.5f;
+                    break;
+                case Alignment.Right:
+                    X.Value = 1f;
+                    Y.Value = 0.5f;
+                    break;
+                case Alignment.Center:
+                    X.Value = 0.5f;
+                    Y.Value = 0.5f;
+                    break;
+            }
+        }
+        public void SetOrigin(Alignment alignment)
+        {
+            OriginX.Unit = LengthUnit.Percent;
+            OriginY.Unit = LengthUnit.Percent;
+            switch (alignment)
+            {
+                case Alignment.TopLeft:
+                    OriginX.Value = 0f;
+                    OriginY.Value = 0f;
+                    break;
+                case Alignment.Top:
+                    OriginX.Value = 0.5f;
+                    OriginY.Value = 0f;
+                    break;
+                case Alignment.TopRight:
+                    OriginX.Value = 1f;
+                    OriginY.Value = 0f;
+                    break;
+                case Alignment.BottomLeft:
+                    OriginX.Value = 0f;
+                    OriginY.Value = 1f;
+                    break;
+                case Alignment.Bottom:
+                    OriginX.Value = 0.5f;
+                    OriginY.Value = 1f;
+                    break;
+                case Alignment.BottomRight:
+                    OriginX.Value = 1f;
+                    OriginY.Value = 1f;
+                    break;
+                case Alignment.Left:
+                    OriginX.Value = 0f;
+                    OriginY.Value = 0.5f;
+                    break;
+                case Alignment.Right:
+                    OriginX.Value = 1f;
+                    OriginY.Value = 0.5f;
+                    break;
+                case Alignment.Center:
+                    OriginX.Value = 0.5f;
+                    OriginY.Value = 0.5f;
+                    break;
+            }
+        }
+
+        protected virtual void CalculateLayout() {}
     }
 
     /// <summary>
     /// Base ui element
     /// </summary>
-    public class Control
+    public class Control : Layout
     {
-        public readonly Layout Layout;
         public List<Control> Children = new List<Control>();
+        public RenderTarget2D RenderTarget
+;
         public bool IsHovered;
         public bool IsHeld;
         
-        private readonly UiManager _uiManager;
+        internal UIManager UIManager;
+        
         private readonly List<Control> _childrenToAdd = new List<Control>();
         private readonly List<Control> _childrenToRemove = new List<Control>();
         private float _x;
         private float _y;
         private float _width;
         private float _height;
-        private float _layerDepth = DrawLayer.Ui;
+        private float _layerDepth = DrawLayer.UI;
         
         
         public Control()
         {
-            Layout = new Layout();
-            Layout.LayoutChange += CalculateLayout;
-            Moved += OnMove;
-            Resized += OnResize;
-            Hovered += OnHover;
-            Unhovered += OnUnhover;
-            Pressed += OnPress;
-            Released += OnRelease;
-        }
-        public Control(Layout layout)
-        {
-            Layout = layout;
-            layout.LayoutChange += CalculateLayout;
             Moved += OnMove;
             Resized += OnResize;
             Hovered += OnHover;
@@ -139,8 +221,7 @@ namespace Ember.UI
             Released += OnRelease;
         }
 
-        public bool IsEnabled { get; set; } = true;
-        public float X
+        public float ActualX
         {
             get => _x;
             private set
@@ -149,7 +230,7 @@ namespace Ember.UI
                 Moved?.Invoke();
             }
         }
-        public float Y
+        public float ActualY
         {
             get => _y;
             private set
@@ -158,7 +239,7 @@ namespace Ember.UI
                 Moved?.Invoke();
             }
         }
-        public float Width
+        public float ActualWidth
         {
             get => _width;
             private set
@@ -167,7 +248,7 @@ namespace Ember.UI
                 Resized?.Invoke();
             }
         }
-        public float Height
+        public float ActualHeight
         {
             get => _height;
             private set
@@ -176,6 +257,23 @@ namespace Ember.UI
                 Resized?.Invoke();
             }
         }
+        public Vector2 Position => new (ActualX, ActualY);
+        public Vector2 AbsolutePosition
+        {
+            get
+            {
+                if (Parent != null)
+                    return Parent.AbsolutePosition + Position;
+                return Position;
+            }
+        }
+        private Vector2 Size => new(ActualWidth, ActualHeight);
+        public RectangleF Bounds => new RectangleF(Position, Size);
+        public RectangleF AbsoluteBounds => new RectangleF(AbsolutePosition, Size);
+        
+        public Control Parent { get; private set; }
+        public bool IsEnabled { get; set; } = true;
+        
         public float LayerDepth
         {
             get => _layerDepth;
@@ -187,44 +285,6 @@ namespace Ember.UI
                         element.LayerDepth = LayerDepth + DrawLayer.Increment;
             }
         }
-        public Vector2 Position
-        {
-            get => new (X, Y);
-            set
-            {
-                X = value.X;
-                Y = value.Y;
-            }
-        }
-        public Vector2 AbsolutePosition
-        {
-            get
-            {
-                if (Parent != null)
-                    return Parent.AbsolutePosition + Position;
-                return Position;
-            }
-        }
-        public Vector2 Size
-        {
-            get => new(Width, Height);
-            set
-            {
-                Width = value.X;
-                Height = value.Y;
-            }
-        }
-        public RectangleF Bounds
-        {
-            get => new RectangleF(Position, Size);
-            set
-            {
-                Position = new Vector2(value.X, value.Y);
-                Size = new Vector2(value.Width, value.Height);
-            }
-        }
-        public RectangleF AbsoluteBounds => new RectangleF(AbsolutePosition, Size);
-        public Control Parent { get; private set; }
 
         public Action Moved;
         public Action Resized;
@@ -233,43 +293,49 @@ namespace Ember.UI
         public Action Pressed;
         public Action Released;
         
-        public void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime)
         {
             if (IsEnabled)
             {
-                OnUpdate(gameTime);
                 foreach (Control child in Children)
                 {
                     if (child.IsEnabled)
                         child.Update(gameTime);
                 }
+
+                Children = Children.Except(_childrenToRemove).ToList();
+
+                foreach (Control child in _childrenToAdd)
+                {
+                    if (child.LayerDepth <= LayerDepth)
+                        child.LayerDepth = LayerDepth + DrawLayer.Increment;
+                    Children.Add(child);
+                }
+
+                _childrenToAdd.Clear();
+                _childrenToRemove.Clear();
+
+                if (ShouldCalculateLayout)
+                {
+                    CalculateLayout();
+                    ShouldCalculateLayout = false;
+                }
             }
-            Children = Children.Except(_childrenToRemove).ToList();
-            Children.AddRange(_childrenToAdd);
-            foreach (Control child in _childrenToAdd)
-            {
-                if (child.LayerDepth <= LayerDepth)
-                    child.LayerDepth = LayerDepth + DrawLayer.Increment;
-                Children.Add(child);
-            }
-            
-            _childrenToAdd.Clear();
-            _childrenToRemove.Clear();
         }
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public virtual void Draw(GraphicsContext graphicsContext, GameTime gameTime)
         {
             if (IsEnabled)
             {
-                OnDraw(spriteBatch, gameTime);
                 foreach (Control child in Children)
                 {
                     if (child.IsEnabled)
-                        child.Draw(spriteBatch, gameTime);
+                        child.Draw(graphicsContext, gameTime);
                 }
             }
         }
         public void AddChild(Control control)
         {
+            control.UIManager = UIManager;
             control.Parent = this;
             if (control.LayerDepth <= LayerDepth)
                 control.LayerDepth = LayerDepth + DrawLayer.Increment;
@@ -278,11 +344,8 @@ namespace Ember.UI
         public void RemoveChild(Control control)
         {
             _childrenToRemove.Add(control);
-            _uiManager.AddChild(control);
         }
 
-        protected virtual void OnUpdate(GameTime gameTime) { }
-        protected virtual void OnDraw(SpriteBatch spriteBatch, GameTime gameTime) { }
         protected virtual void OnMove() { }
         protected virtual void OnResize() { }
         protected virtual void OnHover() { }
@@ -290,42 +353,61 @@ namespace Ember.UI
         protected virtual void OnPress() { }
         protected virtual void OnRelease() { }
 
-        private void CalculateLayout()
+        protected override void CalculateLayout()
         {
-            float xPixels = Layout.X;
-            if (Layout.XUnit == LengthUnit.Percent) xPixels = Math.Clamp(Layout.X, 0f, 1f) * Parent.X;
-            float yPixels = Layout.Y;
-            if (Layout.YUnit == LengthUnit.Percent) yPixels = Math.Clamp(Layout.Y, 0f, 1f) * Parent.Y;
-            Width = Layout.Width;
-            if (Layout.WidthUnit == LengthUnit.Percent) Width = Math.Clamp(Layout.Width, 0f, 1f) * Parent.Width;
-            Height = Layout.Height;
-            if (Layout.HeightUnit == LengthUnit.Percent) Height = Math.Clamp(Layout.Height, 0f, 1f) * Parent.Height; 
-
-            switch (Layout.HorizontalAlignment)
+            ActualX = X.Value;
+            if (X.Unit == LengthUnit.Percent)
             {
-                case HorizontalAlignment.Left:
-                    X = xPixels;
-                    break;
-                case HorizontalAlignment.Right:
-                    X = Parent.Width - Width - xPixels;
-                    break;
-                case HorizontalAlignment.Center:
-                    X = (Parent.Width + Width) / 2 + xPixels;
-                    break;
+                ActualX = Math.Clamp(X.Value, 0f, 1f) * Parent.ActualWidth;
             }
 
-            switch (Layout.VerticalAlignment)
-            {
-                case VerticalAlignment.Top:
-                    Y = yPixels;
-                    break;
-                case VerticalAlignment.Bottom:
-                    Y = Parent.Height - Height - yPixels;
-                    break;
-                case VerticalAlignment.Center:
-                    Y = (Parent.Height + Height) / 2 + yPixels;
-                    break;
-            }
+            ActualY = Y.Value;
+            if (Y.Unit == LengthUnit.Percent) 
+                ActualY = Math.Clamp(Y.Value, 0f, 1f) * Parent.ActualHeight;
+            
+            ActualWidth = Width.Value;
+            if (Width.Unit == LengthUnit.Percent) 
+                ActualWidth = Math.Clamp(Width.Value, 0f, 1f) * Parent.ActualWidth;
+            
+            ActualHeight = Height.Value;
+            if (Height.Unit == LengthUnit.Percent) 
+                ActualHeight = Math.Clamp(Height.Value, 0f, 1f) * Parent.ActualHeight;
+
+            if (OriginX.Unit == LengthUnit.Pixels)
+                ActualX -= OriginX.Value;
+            else
+                ActualX -= ActualWidth * OriginX.Value;
+            
+            if (OriginY.Unit == LengthUnit.Pixels)
+                ActualY -= OriginY.Value;
+            else
+                ActualY -= ActualHeight * OriginY.Value;
+
+            //switch (HorizontalAlignment)
+            //{
+            //    case HorizontalAlignment.Left:
+            //        ActualX = xPixels;
+            //        break;
+            //    case HorizontalAlignment.Right:
+            //        ActualX = Parent.ActualWidth - ActualWidth - xPixels;
+            //        break;
+            //    case HorizontalAlignment.Center:
+            //        ActualX = (Parent.ActualWidth - ActualWidth) / 2 + xPixels;
+            //        break;
+            //}
+
+            //switch (VerticalAlignment)
+            //{
+            //    case VerticalAlignment.Top:
+            //        ActualY = yPixels;
+            //        break;
+            //    case VerticalAlignment.Bottom:
+            //        ActualY = Parent.ActualHeight - ActualHeight - yPixels;
+            //        break;
+            //    case VerticalAlignment.Center:
+            //        ActualY = (Parent.ActualHeight - ActualHeight) / 2 + yPixels;
+            //        break;
+            //}
         }
     }
 }

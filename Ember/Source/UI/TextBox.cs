@@ -1,40 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using FontStashSharp;
 using Ember.Graphics;
 
 namespace Ember.UI
 {
+    public enum TextAlignment
+    {
+        Left, 
+        Center,
+        Right
+    }
+
+    public enum FormatOption
+    {
+        None,
+        TextToBounds,
+        BoundsToText
+    };
+    
     public class TextBox : Control
     {
-        public Vector2? Scale;
+        public Vector2 Scale = Vector2.One;
         public Color Color = Color.White;
         public Color[] CharacterColors;
         public float Rotation;
+        public bool UsesCharacterColors = false;
+        public FormatOption FormatOption = FormatOption.BoundsToText;
         
-        private FontSystem _fontSystem = new FontSystem();
-        private FontSystemSettings _fontSettings;
         private byte[] _font;
         private int _fontSize;
+        private bool _shouldFormatTextBox = false;
         private int _characterSpacing;
         private int _lineSpacing;
         private string _text;
         private string _textToDraw;
+        private FontSystem _fontSystem = new FontSystem();
+        private FontSystemSettings _fontSettings;
 
-        public TextBox(UiManager uiManager, byte[] font = null, string text = "", int fontSize = 10,
-            int characterSpacing = 0, int lineSpacing = 0) : base(uiManager)
+        public TextBox(byte[] font, 
+                       string text = "", 
+                       int fontSize = 10,
+                       int characterSpacing = 0, 
+                       int lineSpacing = 0) 
         {
-            if (font != null)
-                Font = font;
-            else
-                Font = Fonts.OpenSans;
-            _text = text;
-            _fontSize = fontSize;
-            _characterSpacing = characterSpacing;
-            _lineSpacing = lineSpacing;
-            FormatTextToBounds();
+            Font = font;
+            Text = text;
+            FontSize = fontSize;
+            CharacterSpacing = characterSpacing;
+            LineSpacing = lineSpacing;
+            Resized += () => _shouldFormatTextBox = true;
         }
 
         public byte[] Font
@@ -45,6 +61,7 @@ namespace Ember.UI
                 _font = value;
                 _fontSystem.Reset();
                 _fontSystem.AddFont(_font);
+                _shouldFormatTextBox = true;
             }
         } 
         public string Text
@@ -53,7 +70,8 @@ namespace Ember.UI
             set
             {
                 _text = value;
-                FormatTextToBounds();
+                _textToDraw = value;
+                _shouldFormatTextBox = true;
             }
         }
         public int FontSize
@@ -62,7 +80,7 @@ namespace Ember.UI
             set
             {
                 _fontSize = value;
-                FormatTextToBounds();
+                _shouldFormatTextBox = true;
             }
         }
         public int CharacterSpacing
@@ -71,7 +89,7 @@ namespace Ember.UI
             set
             {
                 _characterSpacing = value;
-                FormatTextToBounds();
+                _shouldFormatTextBox = true;
             }
         }
         public int LineSpacing
@@ -80,7 +98,7 @@ namespace Ember.UI
             set
             {
                 _lineSpacing = value;
-                FormatTextToBounds();
+                _shouldFormatTextBox = true;
             }
         }
         public FontSystemSettings FontSettings
@@ -90,32 +108,57 @@ namespace Ember.UI
             {
                 _fontSettings = value;
                 _fontSystem = new FontSystem(value);
+                _shouldFormatTextBox = true;
             }
         }
-        public SpriteFontBase SpriteFont => _fontSystem.GetFont(FontSize);
 
-        protected override void OnDraw(SpriteBatch spriteBatch, GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
-            if (CharacterColors != null)
+            base.Update(gameTime);
+            if (_shouldFormatTextBox)
             {
-                spriteBatch.DrawString(SpriteFont, _textToDraw, AbsolutePosition, CharacterColors, Scale,
-                                       Rotation, Origin, LayerDepth, CharacterSpacing, LineSpacing);
+                FormatTextBox();
+                _shouldFormatTextBox = false;
+            }
+        }
+
+        public override void Draw(GraphicsContext graphicsContext, GameTime gameTime)
+        {
+            if (UsesCharacterColors)
+            {
+                graphicsContext.SpriteBatch.DrawString(_fontSystem.GetFont(FontSize), _textToDraw, AbsolutePosition, CharacterColors, Scale,
+                    Rotation, Vector2.Zero, LayerDepth, CharacterSpacing, LineSpacing);
             }
             else
             {
-                spriteBatch.DrawString(SpriteFont, _textToDraw, AbsolutePosition, Color, Scale,
-                                       Rotation, Origin, LayerDepth, CharacterSpacing, LineSpacing);
+                Console.WriteLine("Test");
+                graphicsContext.SpriteBatch.DrawString(_fontSystem.GetFont(FontSize), _textToDraw, AbsolutePosition, Color, Scale,
+                    Rotation, Vector2.Zero, LayerDepth, CharacterSpacing, LineSpacing);
             }
         }
 
+        private void FormatTextBox()
+        {
+            switch (FormatOption)
+            {
+                case FormatOption.TextToBounds:
+                    FormatTextToBounds();
+                    break;
+                case FormatOption.BoundsToText:
+                    FormatBoundsToText();
+                    break;
+                case FormatOption.None:
+                    break;
+            }
+        }
         private void FormatTextToBounds()
         {
-            if (SpriteFont.MeasureString(_text, Scale, CharacterSpacing, LineSpacing).X > Width)
+            if (_fontSystem.GetFont(FontSize).MeasureString(_text, Scale, CharacterSpacing, LineSpacing).X > ActualWidth)
             {
                 List<string> lines = new List<string>();
                 string lineText = _text;
                 bool endOfLineReached = false;
-                while (SpriteFont.MeasureString(lineText, null, CharacterSpacing, LineSpacing).X > Height)
+                while (_fontSystem.GetFont(FontSize).MeasureString(lineText, Scale, CharacterSpacing, LineSpacing).X > ActualWidth)
                 {
                     for (int i = 1; i <= lineText.Length; i++)
                     {
@@ -126,7 +169,7 @@ namespace Ember.UI
                             break;
                         }
 
-                        if (SpriteFont.MeasureString(lineText[..i], null, CharacterSpacing, LineSpacing).X > Width) 
+                        if (_fontSystem.GetFont(FontSize).MeasureString(lineText[..i], Scale, CharacterSpacing, LineSpacing).X > ActualWidth) 
                         {
                             lines.Add(lineText[..i] + "\n");
                             lineText = lineText[i..];
@@ -140,6 +183,15 @@ namespace Ember.UI
             }
             else
                 _textToDraw = _text;
+        }
+
+        private void FormatBoundsToText()
+        {
+            Width.Unit = LengthUnit.Pixels;
+            Height.Unit = LengthUnit.Pixels;
+            Vector2 size = _fontSystem.GetFont(FontSize).MeasureString(_text, Scale, CharacterSpacing, LineSpacing);
+            Width.Value = size.X;
+            Height.Value = size.Y;
         }
     }
 }

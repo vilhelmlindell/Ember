@@ -1,18 +1,24 @@
 ﻿using System.Collections.Generic;
+using Ember.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Ember.UI
 {
-    public sealed class UiManager : Control
+    public sealed class UIManager : Control
     {
-        public UiManager(Viewport viewport)
+        public readonly GraphicsContext GraphicsContext;
+        
+        public UIManager(Viewport viewport, GraphicsContext graphicsContext)
         {
-            Width = viewport.Width;
-            Height = viewport.Height;
+            Width.Value = viewport.Width;
+            Height.Value = viewport.Height;
+            GraphicsContext = graphicsContext;
+            
+            UIManager = this;
         }
 
-        protected override void OnUpdate(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             foreach (Control control in CollectControls(Children))
             {
@@ -20,11 +26,11 @@ namespace Ember.UI
             }
             base.Update(gameTime);
         }
-        protected override void OnDraw(SpriteBatch spriteBatch, GameTime gameTime)
+        public override void Draw(GraphicsContext graphicsContext, GameTime gameTime)
         {
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp);
-            base.Draw(spriteBatch, gameTime);
-            spriteBatch.End();
+            graphicsContext.SpriteBatch.Begin(SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp);
+            base.Draw(graphicsContext, gameTime);
+            graphicsContext.SpriteBatch.End();
         }
 
         private IEnumerable<Control> CollectControls(List<Control> controls)
