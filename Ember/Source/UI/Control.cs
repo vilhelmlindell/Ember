@@ -195,8 +195,6 @@ namespace Ember.UI
     public class Control : Layout
     {
         public List<Control> Children = new List<Control>();
-        public RenderTarget2D RenderTarget
-;
         public bool IsHovered;
         public bool IsHeld;
         
@@ -340,18 +338,22 @@ namespace Ember.UI
             if (control.LayerDepth <= LayerDepth)
                 control.LayerDepth = LayerDepth + DrawLayer.Increment;
             _childrenToAdd.Add(control);
+            OnParentAdded();
         }
         public void RemoveChild(Control control)
         {
             _childrenToRemove.Add(control);
+            OnParentRemoved();
         }
 
-        protected virtual void OnMove() { }
-        protected virtual void OnResize() { }
-        protected virtual void OnHover() { }
-        protected virtual void OnUnhover() { }
-        protected virtual void OnPress() { }
-        protected virtual void OnRelease() { }
+        protected virtual void OnMove() {}
+        protected virtual void OnResize() {}
+        protected virtual void OnHover() {}
+        protected virtual void OnUnhover() {}
+        protected virtual void OnPress() {}
+        protected virtual void OnRelease() {}
+        protected virtual void OnParentAdded() {}
+        protected virtual void OnParentRemoved() {}
 
         protected override void CalculateLayout()
         {
