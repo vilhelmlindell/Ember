@@ -20,12 +20,12 @@ namespace Ember.UI
             Height.Value = sprite.Texture.Height;
         }
 
-        public override void Draw(GraphicsContext graphicsContext, GameTime gameTime)
+        public override void Draw(GraphicsContext graphicsContext, GameTime gameTime, Vector2 parentPosition)
         {
-            graphicsContext.SpriteBatch.Draw(Sprite.Texture, AbsoluteBounds.Rectangle, Sprite.SourceRectangle,
-                Color, Rotation, Vector2.Zero, SpriteEffect, LayerDepth);
+            graphicsContext.SpriteBatch.Draw(Sprite.Texture, new RectangleF(Position + parentPosition, ActualWidth, ActualHeight).Rectangle, 
+                Sprite.SourceRectangle, Color, Rotation, Vector2.Zero, SpriteEffect, LayerDepth);
 
-            base.Draw(graphicsContext, gameTime);
+            base.Draw(graphicsContext, gameTime, parentPosition);
         }
     }
 }

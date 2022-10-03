@@ -26,10 +26,10 @@ namespace Ember.UI
             }
             base.Update(gameTime);
         }
-        public override void Draw(GraphicsContext graphicsContext, GameTime gameTime)
+        public override void Draw(GraphicsContext graphicsContext, GameTime gameTime, Vector2 parentPosition)
         {
             graphicsContext.SpriteBatch.Begin(SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp);
-            base.Draw(graphicsContext, gameTime);
+            base.Draw(graphicsContext, gameTime, parentPosition);
             graphicsContext.SpriteBatch.End();
         }
 

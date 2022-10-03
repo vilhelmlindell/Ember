@@ -4,12 +4,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Ember.Graphics
 {
-    public sealed class ShapeBatcher
+    public sealed class ShapeBatch
     {
+        private readonly GraphicsDevice _graphicsDevice;
+        private readonly BasicEffect _effect;
+        
         private bool _isDisposed;
-        private GraphicsDevice _graphicsDevice;
-        private BasicEffect _effect;
-
         private VertexPositionColor[] _vertices;
         private int[] _indices;
 
@@ -19,7 +19,7 @@ namespace Ember.Graphics
 
         private bool _isStarted;
 
-        public ShapeBatcher(GraphicsDevice graphicsDevice)
+        public ShapeBatch(GraphicsDevice graphicsDevice)
         {
             _isDisposed = false;
             _graphicsDevice = graphicsDevice ?? throw new ArgumentNullException(nameof(graphicsDevice));
@@ -60,7 +60,7 @@ namespace Ember.Graphics
 
         public void End()
         {
-            if (_isStarted) throw new Exception("batching was never started.");
+            if (!_isStarted) throw new Exception("batching was never started.");
             
             Flush();
             _isStarted = false;
@@ -71,6 +71,20 @@ namespace Ember.Graphics
             if (_shapeCount == 0) return;
             
             EnsureStarted();
+
+            foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                _graphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(
+                    PrimitiveType.TriangleList,
+                    _vertices,
+                    0,
+                    _vertexCount,
+                    _indices,
+                    0,
+                    _indexCount / 3);
+                Console.WriteLine(_vertexCount);
+            }
 
             _shapeCount = 0;
             _vertexCount = 0;
@@ -125,6 +139,8 @@ namespace Ember.Graphics
             _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(b, 0f), color);
             _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(c, 0f), color);
             _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(d, 0f), color);
+
+            _shapeCount++;
         }
     }
 }

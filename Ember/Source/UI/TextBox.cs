@@ -122,16 +122,15 @@ namespace Ember.UI
             }
         }
 
-        public override void Draw(GraphicsContext graphicsContext, GameTime gameTime)
+        public override void Draw(GraphicsContext graphicsContext, GameTime gameTime, Vector2 parentPosition)
         {
             if (UsesCharacterColors)
             {
-                graphicsContext.SpriteBatch.DrawString(_fontSystem.GetFont(FontSize), _textToDraw, AbsolutePosition, CharacterColors, Scale,
-                    Rotation, Vector2.Zero, LayerDepth, CharacterSpacing, LineSpacing);
+                graphicsContext.SpriteBatch.DrawString(_fontSystem.GetFont(FontSize), _textToDraw, Position + parentPosition,
+                    CharacterColors, Scale, Rotation, Vector2.Zero, LayerDepth, CharacterSpacing, LineSpacing);
             }
             else
             {
-                Console.WriteLine("Test");
                 graphicsContext.SpriteBatch.DrawString(_fontSystem.GetFont(FontSize), _textToDraw, AbsolutePosition, Color, Scale,
                     Rotation, Vector2.Zero, LayerDepth, CharacterSpacing, LineSpacing);
             }

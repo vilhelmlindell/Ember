@@ -320,14 +320,14 @@ namespace Ember.UI
                 }
             }
         }
-        public virtual void Draw(GraphicsContext graphicsContext, GameTime gameTime)
+        public virtual void Draw(GraphicsContext graphicsContext, GameTime gameTime, Vector2 parentPosition)
         {
             if (IsEnabled)
             {
                 foreach (Control child in Children)
                 {
                     if (child.IsEnabled)
-                        child.Draw(graphicsContext, gameTime);
+                        child.Draw(graphicsContext, gameTime, parentPosition);
                 }
             }
         }

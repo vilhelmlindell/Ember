@@ -17,8 +17,9 @@ namespace Ember
     public class Main : Game
     {
         private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
         private GraphicsContext _graphicsContext;
+        private SpriteBatch _spriteBatch;
+        private ShapeBatch _shapeBatch;
 
         private Camera _camera;
         private World _world;
@@ -59,11 +60,14 @@ namespace Ember
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _graphicsContext = new GraphicsContext(_graphics.GraphicsDevice, _spriteBatch);
+            _shapeBatch = new ShapeBatch(GraphicsDevice);
+            _graphicsContext = new GraphicsContext(GraphicsDevice, _spriteBatch, _shapeBatch);
             
             _uiManager = new UIManager(GraphicsDevice.Viewport, _graphicsContext);
             _textBox = new TextBox(Fonts.OpenSans, "Hello World", 20);
             _uiManager.AddChild(_textBox);
+            _textBox.SetOrigin(Alignment.Center);
+            _textBox.SetPosition(Alignment.Center);
 
             Shaders.LoadShaders(Content, GraphicsDevice);
             Item.LoadItems(Content);
@@ -81,19 +85,19 @@ namespace Ember
             _tilemap.AddComponent(tilemap);
             _player.AddComponent(new Position());
             _player.AddComponent(new Physics());
-            var sprite = new SpriteRenderer()
+            var sprite = new SpriteRenderer
             {
                 Texture = Content.Load<Texture2D>("Assets/Sprites/Slime"),
                 LayerDepth = DrawLayer.Default
             };
             _player.AddComponent(sprite);
-            var spriteAnimator = new SpriteAnimator()
+            var spriteAnimator = new SpriteAnimator
             {
                 Animation = AnimationParser.LoadJson("Content/Assets/Animations/Slime.json")
             };
             spriteAnimator.Play("Idle");
             _player.AddComponent(spriteAnimator);
-            _player.AddComponent(new BoxCollider()
+            _player.AddComponent(new BoxCollider
             {
                 Width = 32,
                 Height = 23,
@@ -101,7 +105,7 @@ namespace Ember
             });
             _player.AddComponent(new PlayerMovement(3, 60, 5, 120, 100, 5, 3));
             _player.AddComponent(new CameraFollow());
-            _player.AddComponent(new Player()
+            _player.AddComponent(new Player
             {
                 Tilemap = tilemap
             });
@@ -142,7 +146,10 @@ namespace Ember
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             //_world.Draw(gameTime);
-            _uiManager.Draw(_graphicsContext, gameTime);
+            _shapeBatch.Begin();
+            _shapeBatch.DrawRectangle(0, 0, 20, 300, Color.Red);
+            _shapeBatch.End();
+            _uiManager.Draw(_graphicsContext, gameTime, Vector2.Zero);
 
             base.Draw(gameTime);
         }

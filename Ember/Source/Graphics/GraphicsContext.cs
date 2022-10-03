@@ -12,11 +12,13 @@ namespace Ember.Graphics
     {
         public readonly GraphicsDevice GraphicsDevice;
         public readonly SpriteBatch SpriteBatch;
+        public readonly ShapeBatch ShapeBatch;
         
-        public GraphicsContext(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+        public GraphicsContext(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, ShapeBatch shapeBatch)
         {
             GraphicsDevice = graphicsDevice;
             SpriteBatch = spriteBatch;
+            ShapeBatch = shapeBatch;
         }
         
         //private class SpriteDrawCall
