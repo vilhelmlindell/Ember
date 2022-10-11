@@ -146,10 +146,10 @@ namespace Ember
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             //_world.Draw(gameTime);
-            _shapeBatch.Begin();
-            _shapeBatch.DrawRectangle(0, 0, 20, 300, Color.Red);
-            _shapeBatch.End();
             _uiManager.Draw(_graphicsContext, gameTime, Vector2.Zero);
+            _shapeBatch.Begin();
+            _shapeBatch.DrawLine(0, 0, 200, 100, 1, Color.Pink);
+            _shapeBatch.End();
 
             base.Draw(gameTime);
         }

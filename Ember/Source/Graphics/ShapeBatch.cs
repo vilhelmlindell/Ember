@@ -9,9 +9,9 @@ namespace Ember.Graphics
         private readonly GraphicsDevice _graphicsDevice;
         private readonly BasicEffect _effect;
         
+        private readonly VertexPositionColor[] _vertices;
+        private readonly int[] _indices;
         private bool _isDisposed;
-        private VertexPositionColor[] _vertices;
-        private int[] _indices;
 
         private int _shapeCount;
         private int _vertexCount;
@@ -44,7 +44,7 @@ namespace Ember.Graphics
         {
             if (_isDisposed) return;
             
-            _effect?.Dispose();
+            _effect.Dispose();
             _isDisposed = true;
         }
 
@@ -53,7 +53,7 @@ namespace Ember.Graphics
             if (_isStarted) throw new Exception("batching is already started.");
 
             Viewport viewport = _graphicsDevice.Viewport;
-            _effect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, 0, viewport.Height, 0f, 1f);
+            _effect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0f, 1f);
             
             _isStarted = true;
         }
@@ -83,7 +83,6 @@ namespace Ember.Graphics
                     _indices,
                     0,
                     _indexCount / 3);
-                Console.WriteLine(_vertexCount);
             }
 
             _shapeCount = 0;
@@ -139,6 +138,106 @@ namespace Ember.Graphics
             _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(b, 0f), color);
             _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(c, 0f), color);
             _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(d, 0f), color);
+
+            _shapeCount++;
+        }
+        public void DrawRectangle(Vector2 position, Vector2 size, Color color)
+        {
+            EnsureStarted();
+
+            const int shapeVertexCount = 4;
+            const int shapeIndexCount = 6;
+            
+            EnsureSpace(shapeVertexCount, shapeIndexCount);
+
+            float left = position.X;
+            float right = position.X + size.X;
+            float top = position.Y;
+            float bottom = position.Y + size.Y;
+
+            Vector2 a = new Vector2(left, top);
+            Vector2 b = new Vector2(right, top);
+            Vector2 c = new Vector2(right, bottom);
+            Vector2 d = new Vector2(left, bottom);
+
+            _indices[_indexCount++] = 0 + _vertexCount;
+            _indices[_indexCount++] = 1 + _vertexCount;
+            _indices[_indexCount++] = 2 + _vertexCount;
+            _indices[_indexCount++] = 0 + _vertexCount;
+            _indices[_indexCount++] = 2 + _vertexCount;
+            _indices[_indexCount++] = 3 + _vertexCount;
+
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(a, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(b, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(c, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(d, 0f), color);
+
+            _shapeCount++;
+        }
+
+        public void DrawLine(float x1, float y1, float x2, float y2, float thickness, Color color)
+        {
+            EnsureStarted();
+
+            const int shapeVertexCount = 4;
+            const int shapeIndexCount = 6;
+            
+            EnsureSpace(shapeVertexCount, shapeIndexCount);
+
+            float k1 = ((y2 - y1) / (x2 - x1));
+            float k2 = -1 / k1;
+            float xt = MathF.Sqrt((thickness * thickness) / (4 * (1 + k2 * k2)));
+            float yt = k2 * xt;
+
+            Vector2 q1 = new Vector2(x1 + xt, y1 + yt);
+            Vector2 q2 = new Vector2(x2 + xt, y2 + yt);
+            Vector2 q3 = new Vector2(x2 - xt, y2 - yt);
+            Vector2 q4 = new Vector2(x1 - xt, y1 - yt);
+
+            _indices[_indexCount++] = 0 + _vertexCount;
+            _indices[_indexCount++] = 1 + _vertexCount;
+            _indices[_indexCount++] = 2 + _vertexCount;
+            _indices[_indexCount++] = 0 + _vertexCount;
+            _indices[_indexCount++] = 2 + _vertexCount;
+            _indices[_indexCount++] = 3 + _vertexCount;
+
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(q1, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(q2, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(q3, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(q4, 0f), color);
+
+            _shapeCount++;
+        }
+        public void DrawLine(Vector2 p1, Vector2 p2, float thickness, Color color)
+        {
+            EnsureStarted();
+
+            const int shapeVertexCount = 4;
+            const int shapeIndexCount = 6;
+            
+            EnsureSpace(shapeVertexCount, shapeIndexCount);
+
+            float k1 = ((p2.Y - p1.Y) / (p2.X - p1.X));
+            float k2 = -1 / k1;
+            float xt = MathF.Sqrt((thickness * thickness) / (4 * (1 + k2 * k2)));
+            float yt = k2 * xt;
+
+            Vector2 q1 = new Vector2(p1.X + xt, p1.Y + yt);
+            Vector2 q2 = new Vector2(p2.X + xt, p2.Y + yt);
+            Vector2 q3 = new Vector2(p2.X - xt, p2.Y - yt);
+            Vector2 q4 = new Vector2(p1.X - xt, p1.Y - yt);
+
+            _indices[_indexCount++] = 0 + _vertexCount;
+            _indices[_indexCount++] = 1 + _vertexCount;
+            _indices[_indexCount++] = 2 + _vertexCount;
+            _indices[_indexCount++] = 0 + _vertexCount;
+            _indices[_indexCount++] = 2 + _vertexCount;
+            _indices[_indexCount++] = 3 + _vertexCount;
+
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(q1, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(q2, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(q3, 0f), color);
+            _vertices[_vertexCount++] = new VertexPositionColor(new Vector3(q4, 0f), color);
 
             _shapeCount++;
         }

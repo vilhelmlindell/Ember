@@ -7,186 +7,11 @@ using Ember.Graphics;
 
 namespace Ember.UI
 {
-    public enum Alignment
+    public enum Overflow
     {
-        TopLeft,
-        Top,
-        TopRight,
-        BottomLeft,
-        Bottom,
-        BottomRight,
-        Left,
-        Right,
-        Center
-    }
-    public enum LengthUnit
-    {
-        Pixels,
-        Percent
-    }
-
-
-    public class Length
-    {
-
-        private float _value;
-        private LengthUnit _unit;
-
-        public Length()
-        {
-            _value = 0f;
-            _unit = LengthUnit.Pixels;
-        }
-        public Length(float value = 0f, LengthUnit lengthUnit = LengthUnit.Pixels)
-        {
-            Value = value;
-            Unit = lengthUnit;
-        }
-        
-        public float Value
-        {
-            get => _value;
-            set
-            {
-                _value = value;
-                WasChanged?.Invoke();
-            }
-        }
-        public LengthUnit Unit
-        {
-            get => _unit;
-            set
-            {
-                _unit = value;
-                WasChanged?.Invoke();
-            }
-        }
-
-        public Action WasChanged;
-
-    }
-
-    /// <summary>
-    /// Describes the dimensions of a control
-    /// </summary>
-    public class Layout
-    {
-        protected bool ShouldCalculateLayout = false;
-        
-        public Layout()
-        {
-            X = new Length();
-            Y = new Length();
-            Width = new Length();
-            Height = new Length();
-            OriginX = new Length();
-            OriginY = new Length();
-
-            X.WasChanged += () => ShouldCalculateLayout = true;
-            Y.WasChanged += () => ShouldCalculateLayout = true;
-            Width.WasChanged += () => ShouldCalculateLayout = true;
-            Height.WasChanged += () => ShouldCalculateLayout = true;
-            OriginX.WasChanged += () => ShouldCalculateLayout = true;
-            OriginY.WasChanged += () => ShouldCalculateLayout = true;
-        }
-
-        public Length X { get; set; }
-        public Length Y { get; set; }
-        public Length Width { get; set; }
-        public Length Height { get; set; }
-        public Length OriginX { get; set; }
-        public Length OriginY { get; set; }
-
-        public void SetPosition(Alignment alignment)
-        {
-            X.Unit = LengthUnit.Percent;
-            Y.Unit = LengthUnit.Percent;
-            switch (alignment)
-            {
-                case Alignment.TopLeft:
-                    X.Value = 0f;
-                    Y.Value = 0f;
-                    break;
-                case Alignment.Top:
-                    X.Value = 0.5f;
-                    Y.Value = 0f;
-                    break;
-                case Alignment.TopRight:
-                    X.Value = 1f;
-                    Y.Value = 0f;
-                    break;
-                case Alignment.BottomLeft:
-                    X.Value = 0f;
-                    Y.Value = 1f;
-                    break;
-                case Alignment.Bottom:
-                    X.Value = 0.5f;
-                    Y.Value = 1f;
-                    break;
-                case Alignment.BottomRight:
-                    X.Value = 1f;
-                    Y.Value = 1f;
-                    break;
-                case Alignment.Left:
-                    X.Value = 0f;
-                    Y.Value = 0.5f;
-                    break;
-                case Alignment.Right:
-                    X.Value = 1f;
-                    Y.Value = 0.5f;
-                    break;
-                case Alignment.Center:
-                    X.Value = 0.5f;
-                    Y.Value = 0.5f;
-                    break;
-            }
-        }
-        public void SetOrigin(Alignment alignment)
-        {
-            OriginX.Unit = LengthUnit.Percent;
-            OriginY.Unit = LengthUnit.Percent;
-            switch (alignment)
-            {
-                case Alignment.TopLeft:
-                    OriginX.Value = 0f;
-                    OriginY.Value = 0f;
-                    break;
-                case Alignment.Top:
-                    OriginX.Value = 0.5f;
-                    OriginY.Value = 0f;
-                    break;
-                case Alignment.TopRight:
-                    OriginX.Value = 1f;
-                    OriginY.Value = 0f;
-                    break;
-                case Alignment.BottomLeft:
-                    OriginX.Value = 0f;
-                    OriginY.Value = 1f;
-                    break;
-                case Alignment.Bottom:
-                    OriginX.Value = 0.5f;
-                    OriginY.Value = 1f;
-                    break;
-                case Alignment.BottomRight:
-                    OriginX.Value = 1f;
-                    OriginY.Value = 1f;
-                    break;
-                case Alignment.Left:
-                    OriginX.Value = 0f;
-                    OriginY.Value = 0.5f;
-                    break;
-                case Alignment.Right:
-                    OriginX.Value = 1f;
-                    OriginY.Value = 0.5f;
-                    break;
-                case Alignment.Center:
-                    OriginX.Value = 0.5f;
-                    OriginY.Value = 0.5f;
-                    break;
-            }
-        }
-
-        protected virtual void CalculateLayout() {}
+        Visible,
+        Hidden,
+        Scroll,
     }
 
     /// <summary>
@@ -195,6 +20,7 @@ namespace Ember.UI
     public class Control : Layout
     {
         public List<Control> Children = new List<Control>();
+        public Overflow Overflow = Overflow.Visible;
         public bool IsHovered;
         public bool IsHeld;
         
@@ -202,6 +28,7 @@ namespace Ember.UI
         
         private readonly List<Control> _childrenToAdd = new List<Control>();
         private readonly List<Control> _childrenToRemove = new List<Control>();
+        private RenderTarget2D _renderTarget;
         private float _x;
         private float _y;
         private float _width;
@@ -255,6 +82,10 @@ namespace Ember.UI
                 Resized?.Invoke();
             }
         }
+
+        public float OverflowWidth
+        {
+        }
         public Vector2 Position => new (ActualX, ActualY);
         public Vector2 AbsolutePosition
         {
@@ -265,7 +96,7 @@ namespace Ember.UI
                 return Position;
             }
         }
-        private Vector2 Size => new(ActualWidth, ActualHeight);
+        public Vector2 Size => new(ActualWidth, ActualHeight);
         public RectangleF Bounds => new RectangleF(Position, Size);
         public RectangleF AbsoluteBounds => new RectangleF(AbsolutePosition, Size);
         
@@ -322,14 +153,19 @@ namespace Ember.UI
         }
         public virtual void Draw(GraphicsContext graphicsContext, GameTime gameTime, Vector2 parentPosition)
         {
-            if (IsEnabled)
+            if (IsEnabled && UIManager != null)
             {
+                graphicsContext.GraphicsDevice.SetRenderTarget(_renderTarget);
                 foreach (Control child in Children)
                 {
                     if (child.IsEnabled)
                         child.Draw(graphicsContext, gameTime, parentPosition);
                 }
             }
+        }
+
+        public void UpdateRenderTargetSize()
+        {
         }
         public void AddChild(Control control)
         {
@@ -352,7 +188,12 @@ namespace Ember.UI
         protected virtual void OnUnhover() {}
         protected virtual void OnPress() {}
         protected virtual void OnRelease() {}
-        protected virtual void OnParentAdded() {}
+
+        protected virtual void OnParentAdded()
+        {
+            _renderTarget = new RenderTarget2D(UIManager.GraphicsContext.GraphicsDevice,
+                Convert.ToInt32(ActualWidth), Convert.ToInt32(ActualHeight));
+        }
         protected virtual void OnParentRemoved() {}
 
         protected override void CalculateLayout()
@@ -384,33 +225,8 @@ namespace Ember.UI
                 ActualY -= OriginY.Value;
             else
                 ActualY -= ActualHeight * OriginY.Value;
-
-            //switch (HorizontalAlignment)
-            //{
-            //    case HorizontalAlignment.Left:
-            //        ActualX = xPixels;
-            //        break;
-            //    case HorizontalAlignment.Right:
-            //        ActualX = Parent.ActualWidth - ActualWidth - xPixels;
-            //        break;
-            //    case HorizontalAlignment.Center:
-            //        ActualX = (Parent.ActualWidth - ActualWidth) / 2 + xPixels;
-            //        break;
-            //}
-
-            //switch (VerticalAlignment)
-            //{
-            //    case VerticalAlignment.Top:
-            //        ActualY = yPixels;
-            //        break;
-            //    case VerticalAlignment.Bottom:
-            //        ActualY = Parent.ActualHeight - ActualHeight - yPixels;
-            //        break;
-            //    case VerticalAlignment.Center:
-            //        ActualY = (Parent.ActualHeight - ActualHeight) / 2 + yPixels;
-            //        break;
-            //}
         }
     }
 }
+
 
